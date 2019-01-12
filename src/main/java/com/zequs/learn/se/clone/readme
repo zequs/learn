@@ -1,0 +1,4 @@
+必要性，必须实现cloneable
+浅克隆
+深克隆
+克隆是如何破坏单例模式（readResolve方法）

@@ -1,0 +1,6 @@
+rmi:Java远程方法调用
+创建RMI程序的4个步骤
+    1：定义一个远程接口的接口,接口需要继承Remote接口
+    2：定义一个接口实现类，实现第一步的接口，再继承UnicastRemoteObject类,实现类中需要显示一个抛出RemoteException异常的构造方法。
+    3：发布RMI服务
+    4：调用rmi服务

@@ -1,0 +1,8 @@
+比较器使用的2个api 一个是集合或者数值类的sort()方法
+如Collections中的 public static <T extends Comparable<? super T>> void sort(List<T> list),
+要求的是List中元素必须实现Comparable接口，需要实现 int compareTo(T o) 方法。
+数组也是一样，Arrays也有一个sort方法。public static void sort(Object[] a)。数组中的所有元素都必须实现 Comparable 接口
+
+第二种方法用的是
+    Collections中的 public static <T> void sort(List<T> list, Comparator<? super T> c)方法，比较器作为参数传进来
+    Arrays也有相应的方法。

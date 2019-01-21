@@ -1,0 +1,16 @@
+JDK8新特性Stream知识整理
+1、创建流的方式StreamCreate
+2、流分类
+    数组流，文件流，集合流
+    顺序流，并发流
+3、流式处理分为三个部分转换成流、中间操作、终端操作
+    转换成流：即流的创建，StreamCreate类中有几种流的创建方式
+    中间操作：迭代器一样，处理之后返回的还是Stream自身。
+        如：filter,distinct,limit,skip,sorted,map,flatMap等
+    终端操作：返回其他结果。
+        如：allMatch,anyMatch,noneMatch,count,collect,reduce
+
+
+
+
+博客：https://blog.csdn.net/canot/article/details/52957262

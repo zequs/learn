@@ -16,16 +16,5 @@ public class demo {
         map.put("c","cc");
         List list = Lists.newArrayList();
         map.forEach((k,v)-> System.out.println("key=" + k + v + ""));
-        new AbstractList<>() {
-            @Override
-            public int size() {
-                return 0;
-            }
-
-            @Override
-            public Object get(int index) {
-                return null;
-            }
-        }
     }
 }

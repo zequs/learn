@@ -9,12 +9,12 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.zequs.demo</groupId>
-	<artifactId>eureka-feign-provider</artifactId>
+	<artifactId>eureka-feign-client</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>spring-cloud-eureka-feign-provider-demo</name>
-	<description>spring cloud eureka provider Demo project for Spring Boot</description>
+	<name>spring-cloud-eureka-feign-client-demo</name>
+	<description>spring cloud eureka client Demo project for Spring Boot</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -23,7 +23,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.zequs.spring.cloud.demo</groupId>
+			<groupId>com.zequs.demo</groupId>
 			<artifactId>eureka-feign-api</artifactId>
 		</dependency>
 		<dependency>

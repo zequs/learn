@@ -27,7 +27,7 @@ public class PersonClientController implements PersonService {
 
     @Override
     public boolean save(@RequestBody Person person) {
-        return personService.save(person);
+""        return personService.save(person);
     }
 
     @Override

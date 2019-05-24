@@ -1,6 +1,9 @@
 package com.zequs.demo.eureka.feign.controller;
 
+import com.zequs.demo.eureka.feign.api.service.Person;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2017/11/5
  */
 @RestController
+@RequestMapping("/person")
 public class PersonServiceProviderController {
 
     /**
@@ -17,10 +21,23 @@ public class PersonServiceProviderController {
      *
      * @return 如果成功，<code>true</code>
      */
-    @GetMapping("/user/say")
-    public String sayHello() {
-        return "hello world!!!";
+    @RequestMapping("/say")
+    public String sayHello(@RequestBody String name) {
+        return "person hello world!!!" + name;
     }
 
+    @RequestMapping("/sayHello")
+    public String sayhello(String name){
+        return "person say hello!!!" + name;
+    }
+    @RequestMapping("/sayHelloWorld")
+    public String sayHelloWorld(@RequestBody String name){
+        return "person say hello world!!!" + name;
+    }
+
+    @RequestMapping("/testObject")
+    public String aaa(@RequestBody Person person){
+        return "testObject SUCCESS";
+    }
 
 }

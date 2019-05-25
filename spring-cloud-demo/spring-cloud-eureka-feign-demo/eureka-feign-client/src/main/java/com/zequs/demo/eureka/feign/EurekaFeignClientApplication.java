@@ -19,12 +19,12 @@ public class EurekaFeignClientApplication {
         SpringApplication.run(EurekaFeignClientApplication.class, args);
     }
 
-//    @Bean
+    @Bean
     public MonitorInterceptor monitorInterceptor() {
         return new MonitorInterceptor();
     }
 
-//    @Bean
+    @Bean
     public BeanNameAutoProxyCreator transactionAutoProxy() {
         BeanNameAutoProxyCreator transactionAutoProxy = new BeanNameAutoProxyCreator();
         transactionAutoProxy.setProxyTargetClass(true);

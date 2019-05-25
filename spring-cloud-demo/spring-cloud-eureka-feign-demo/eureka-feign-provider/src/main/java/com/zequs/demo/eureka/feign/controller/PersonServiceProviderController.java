@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2017/11/5
  */
 @RestController
-@RequestMapping("/person")
 public class PersonServiceProviderController {
 
     /**
@@ -21,21 +20,21 @@ public class PersonServiceProviderController {
      *
      * @return 如果成功，<code>true</code>
      */
-    @RequestMapping("/say")
+    @RequestMapping("/person/say1")
     public String sayHello(@RequestBody String name) {
         return "person hello world!!!" + name;
     }
 
-    @RequestMapping("/sayHello")
+    @RequestMapping("/person/sayHello")
     public String sayhello(String name){
         return "person say hello!!!" + name;
     }
-    @RequestMapping("/sayHelloWorld")
+    @RequestMapping("/person/sayHelloWorld")
     public String sayHelloWorld(@RequestBody String name){
         return "person say hello world!!!" + name;
     }
 
-    @RequestMapping("/testObject")
+    @RequestMapping("/person/testObject")
     public String aaa(@RequestBody Person person){
         return "testObject SUCCESS";
     }

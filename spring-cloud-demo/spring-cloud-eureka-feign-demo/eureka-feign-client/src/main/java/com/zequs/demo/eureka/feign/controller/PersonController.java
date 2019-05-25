@@ -22,9 +22,9 @@ public class PersonController implements PersonService{
     private PersonService personService;
 
 
-    public String say(@RequestBody String name) {
+    public String say1(@RequestBody String name) {
         System.out.println("端口是：" + port);
-       return personService.say(name);
+       return personService.say1(name);
     }
     public String sayhello(@RequestBody String name) {
         return personService.sayhello(name);

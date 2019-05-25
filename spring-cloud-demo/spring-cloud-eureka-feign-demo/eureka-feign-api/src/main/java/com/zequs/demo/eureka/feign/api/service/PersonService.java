@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 public interface PersonService {
 
-    @RequestMapping("/person/say")
+    @RequestMapping("/person/say1")
     @Headers("Content-Type: application/json")
-    public String say(@RequestBody String name);
+    public String say1(@RequestBody String name);
 
     @RequestMapping("/sayHello")
     @Headers("Content-Type: application/json")

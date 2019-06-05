@@ -1,6 +1,7 @@
 package com.zequs.demo.eureka.feign.controller;
 
 import com.zequs.demo.eureka.feign.api.service.FileService;
+import com.zequs.demo.eureka.feign.api.service.ResponseBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,11 @@ public class FileproessCotroller implements FileService{
         ResponseEntity<byte[]> entity = fileService.downloadFile(fileType);
         System.out.println( entity.getStatusCode());
         return entity ;
+    }
+
+    @Override
+    public ResponseBean downTest(@RequestParam("fileType") String fileType) {
+        return fileService.downTest(fileType);
     }
 
     @Override

@@ -2,10 +2,12 @@ package com.zequs.demo.eureka.feign.controller;
 
 import com.zequs.demo.eureka.feign.api.service.Person;
 import com.zequs.demo.eureka.feign.api.service.PersonService;
+import feign.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -22,11 +24,11 @@ public class PersonController implements PersonService{
     private PersonService personService;
 
 
-    public String say1(@RequestBody String name) {
+    public String say1(@RequestParam("name") String name) {
         System.out.println("端口是：" + port);
        return personService.say1(name);
     }
-    public String sayhello(@RequestBody String name) {
+    public String sayhello(@Param("name") String name) {
         return personService.sayhello(name);
     }
     public String sayHelloWorld(String name) {

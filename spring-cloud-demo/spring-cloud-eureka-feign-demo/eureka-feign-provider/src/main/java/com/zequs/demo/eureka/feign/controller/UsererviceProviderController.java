@@ -21,7 +21,7 @@ public class UsererviceProviderController {
      *
      * @return 如果成功，<code>true</code>
      */
-    @GetMapping("/user/say")
+    @GetMapping("/user/say.json")
     public String sayHello() {
         return "user hello world!!!";
     }

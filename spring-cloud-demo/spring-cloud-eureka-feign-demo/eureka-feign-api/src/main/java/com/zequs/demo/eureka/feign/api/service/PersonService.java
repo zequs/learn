@@ -4,6 +4,7 @@ import feign.Headers;
 import feign.Param;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author zequs
@@ -13,15 +14,15 @@ public interface PersonService {
 
     @RequestMapping("/person/say1")
     @Headers("Content-Type: application/json")
-    public String say1(@RequestBody String name);
+    public String say1(@RequestParam("name") String name);
 
-    @RequestMapping("/sayHello")
+    @RequestMapping("/person/sayHello")
     @Headers("Content-Type: application/json")
     public String sayhello(@Param("name") String name);
 
-    @RequestMapping("/sayHelloWorld")
+    @RequestMapping("/person/sayHelloWorld")
     public String sayHelloWorld(@RequestBody String name);
 
-    @RequestMapping("/testObject")
+    @RequestMapping("/person/testObject")
     public String aaa(@RequestBody Person person);
 }

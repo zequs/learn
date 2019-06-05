@@ -1,5 +1,6 @@
 package com.zequs.demo.eureka.feign.controller;
 
+import com.zequs.demo.eureka.feign.api.service.ResponseBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.UUID;
 
@@ -98,8 +100,11 @@ public class FileproessCotroller {
 
         String uuid =UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
 
-        File dest =   new File("f:/b13/"+uuid+suffix);
+        File dest =   new File("D:/b13/"+uuid+suffix);
         try {
+            if (!dest.exists()) {
+                dest.createNewFile();
+            }
             file.transferTo(dest);
 
             return dest.getCanonicalPath();//文件的绝对路径
@@ -108,5 +113,4 @@ public class FileproessCotroller {
         }
         return "failure";
     }
-
 }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @FeignClient(name = "user-service")
 public interface UserService {
 
-    @RequestMapping("/user/say")
+    @RequestMapping("/user/say.json")
     public String say();
 
     @PostMapping("/user/hello")

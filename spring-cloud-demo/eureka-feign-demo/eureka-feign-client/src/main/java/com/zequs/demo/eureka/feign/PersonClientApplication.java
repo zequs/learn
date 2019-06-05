@@ -15,7 +15,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  */
 @SpringBootApplication
 @EnableEurekaClient
-@EnableFeignClients(clients = PersonService.class)
+@EnableFeignClients(basePackages="com.zequs.demo.eureka.feign.api.service")
 public class PersonClientApplication {
 
     public static void main(String[] args) {

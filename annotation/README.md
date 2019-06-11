@@ -119,7 +119,7 @@ public final class Method extends Executable {
 
 ### 6、组合注解
 
-​		注解上面有其他直接springboot中此注解比较多
+​		注解上面有其他解springboot中此注解比较多
 
 ```java
 @Target(ElementType.METHOD)

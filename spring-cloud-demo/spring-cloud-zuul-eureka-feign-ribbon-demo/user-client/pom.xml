@@ -4,17 +4,16 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.zequs.spring.cloud.demo</groupId>
-		<artifactId>eureka-feign-parent</artifactId>
+		<artifactId>zuul-eureka-feign-ribbon-parent</artifactId>
 		<version>1.0.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.zequs.spring.cloud.demo</groupId>
-	<artifactId>eureka-feign-provider</artifactId>
+	<artifactId>zuul-eureka-feign-ribbon-eureka-user-client-demo</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>spring-cloud-eureka-feign-provider-demo</name>
-	<description>spring cloud eureka provider Demo project for Spring Boot</description>
+	<name>user-client-demo</name>
+	<description>spring cloud user client Demo project for Spring Boot</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -24,7 +23,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>com.zequs.spring.cloud.demo</groupId>
-			<artifactId>eureka-feign-api</artifactId>
+			<artifactId>zuul-eureka-feign-ribbon-user-service-api-demo</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -37,22 +36,6 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.github.openfeign.form</groupId>
-			<artifactId>feign-form</artifactId>
-			<version>3.0.3</version>
-		</dependency>
-		<dependency>
-			<groupId>io.github.openfeign.form</groupId>
-			<artifactId>feign-form-spring</artifactId>
-			<version>3.0.3</version>
 		</dependency>
 	</dependencies>
 

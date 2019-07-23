@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	default-autowire="byName">
+
+	<!--MQ消费者配置信息-->
+	<bean id="mqMessageService" class="com.huihe.common.mq.MqMessageService" init-method="init" destroy-method="destroy"/>
+	<!--Listener 配置:多 CID 订阅同一个 Topic，可以创建多个 ConsumerBean-->
+	<bean id="messageListener" class="com.huihe.common.mq.MqMessageListener" />
+	<bean id="videoConsumer" class="com.huihe.common.mq.MqConsumerBean" init-method="start" destroy-method="shutdown">
+		<property name="subscriptionTable">
+             <map>
+                 <entry value-ref="messageListener">
+                     <key>
+                         <bean class="com.aliyun.openservices.ons.api.bean.Subscription">
+                             <property name="topic" value="${rocketmq.common.topic}"/>
+                             <property name="expression" value="*${rocketmq.video.tag}"/><!--expression 即 Tag，可以设置成具体的 Tag，如 taga||tagb||tagc，也可设置成*。 *仅代表订阅所有 Tag，不支持通配-->
+                         </bean>
+                     </key>
+                 </entry>
+             </map>
+         </property>
+         <property name="rocketmq_gid" value="${rocketmq.video.gid}"/>
+	</bean>
+</beans>

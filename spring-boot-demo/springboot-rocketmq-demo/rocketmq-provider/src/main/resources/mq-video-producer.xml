@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	default-autowire="byName">
+
+	<!--生产者配置信息-->
+	<bean id="videoProducer" class="com.huihe.common.mq.MqProducerBean" init-method="start" destroy-method="shutdown" >
+		<property name="rocketmq_gid" value="${rocketmq.video.gid}"/>
+		<property name="rocketmq_topic" value="${rocketmq.common.topic}"/>
+	</bean>	
+	<bean id="videoAiMqProducer" class="com.huihe.common.mq.producer.VideoAiMqProducer"></bean>
+</beans>

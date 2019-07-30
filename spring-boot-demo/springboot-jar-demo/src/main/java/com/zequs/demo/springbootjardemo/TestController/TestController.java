@@ -1,5 +1,7 @@
 package com.zequs.demo.springbootjardemo.TestController;
 
+import com.zequs.demo.springbootjardemo.demo.Config;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,8 +12,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 
-    @GetMapping("/test")
+    @Autowired
+    private Config config;
+
+    @GetMapping("/jar")
     public String test() {
+        return "success";
+    }
+
+    @GetMapping("/zequs")
+    public String zequs() {
+        System.out.println("name: " + config.getName());
+        System.out.println("prot: " + config.getPort());
         return "success";
     }
 }

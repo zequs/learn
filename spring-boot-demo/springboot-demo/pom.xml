@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.zequs.demo</groupId>
-	<artifactId>springboot-jar-demo</artifactId>
+	<artifactId>spring-boot-demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>springboot-jar-demo</name>
+	<name>spring-boot-demo</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>
@@ -23,16 +23,14 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-loader</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-loader</artifactId>
-			<version>2.1.6.RELEASE</version>
 		</dependency>
 	</dependencies>
 

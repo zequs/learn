@@ -1,4 +1,4 @@
-package com.zequs.demo.springbootjardemo;
+package com.zequs.demo.springbootjardemo.jar;
 
 import com.zequs.demo.springbootjardemo.demo.Config;
 import org.springframework.boot.SpringApplication;
@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-public class SpringbootJarDemoApplication {
+public class JarDemoApplication {
 
 
     /**
@@ -23,7 +23,7 @@ public class SpringbootJarDemoApplication {
         SpringApplication application = new SpringApplication();
         String[] a = {"server.port=8888","author=zequs","--env=dev","--spring.profiles.active=${env}"};
         args = a;
-        SpringApplication.run(SpringbootJarDemoApplication.class, args);
+        SpringApplication.run(JarDemoApplication.class, args);
     }
 
 }

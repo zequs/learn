@@ -304,10 +304,10 @@ public class SpringApplication {
 		//启动监听
 		listeners.starting();
 		try {
-			// 创建 ApplicationArguments 对象
+			//将启动时的参数传入到其构造器中
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
-			ConfigurableEnvironment environment = prepareEnvironment(listeners, applicationArguments);
 			// 准备应用上下文 environment 对象
+			ConfigurableEnvironment environment = prepareEnvironment(listeners, applicationArguments);
 			configureIgnoreBeanInfo(environment);
 			//项目启动时一个大大的spring boot banner
 			Banner printedBanner = printBanner(environment);
@@ -348,9 +348,14 @@ public class SpringApplication {
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments) {
 		// Create and configure the environment
+		//获取项目环境servlet还是reactive以及相应配置
+		//获取4种资源，servletConfigInitParams|servletContextInitParams|systemProperties|systemEnvironment
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
+		//设置环境的信息(commandLineArgs environment 和 profile environment)
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
+		//广播事件，通知所有的观察者，环境已经准备好了
 		listeners.environmentPrepared(environment);
+		//把环境绑定到springApplication
 		bindToSpringApplication(environment);
 		if (!this.isCustomEnvironment) {
 			environment = new EnvironmentConverter(getClassLoader()).convertEnvironmentIfNecessary(environment,
@@ -483,7 +488,10 @@ public class SpringApplication {
 			ConversionService conversionService = ApplicationConversionService.getSharedInstance();
 			environment.setConversionService((ConfigurableConversionService) conversionService);
 		}
+		//commandLineArgs命令行environment，如果有设置命令行参数的话
 		configurePropertySources(environment, args);
+		//获取环境中spring.profiles.active的key,如果有相应的key设置为environment.ActiveProfiles。profiles可以有多个，中间可用逗号隔开
+		//此环境中的资源还没包含application.properties。所以spring.profiles.active需要配置在命令行，servlet环境，系统环境中。
 		configureProfiles(environment, args);
 	}
 

@@ -1,4 +1,4 @@
-package com.zequs.demo.se.designpattern.philosophy.segregation;
+package com.zequs.demo.se.designpattern.principle.segregation;
 
 /**
  * 设计模式-接口隔离原则

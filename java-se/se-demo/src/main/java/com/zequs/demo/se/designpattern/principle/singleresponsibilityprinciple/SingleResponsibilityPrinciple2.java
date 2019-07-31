@@ -1,4 +1,4 @@
-package com.zequs.demo.se.designpattern.philosophy.singleresponsibilityprinciple;
+package com.zequs.demo.se.designpattern.principle.singleresponsibilityprinciple;
 
 /**
  * @author zequs

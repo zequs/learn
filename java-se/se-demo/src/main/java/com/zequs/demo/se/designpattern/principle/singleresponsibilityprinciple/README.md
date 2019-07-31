@@ -12,4 +12,4 @@
 
 - 通常情况下，**我们应当遵守单一职责原则**，只有逻辑足够简单，才可以在代码级违反单一职责原则；只有类中的方法数量足够少时，可以在方法级别上保存单一职责原则。
 
-  **代码地址：**https://github.com/zequs/learn/tree/master/java-se/se-demo/src/main/java/com/zequs/demo/se/designpattern/philosophy/singleresponsibilityprinciple
+  **代码地址：**https://github.com/zequs/learn/tree/master/java-se/se-demo/src/main/java/com/zequs/demo/se/designpattern/principle/singleresponsibilityprinciple

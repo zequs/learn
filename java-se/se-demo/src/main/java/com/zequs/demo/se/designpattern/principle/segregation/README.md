@@ -6,4 +6,4 @@
 
 ​		处理：把接口I，拆成几个独立的接口。类各自实现自己需要的接口。
 
-​		[代码地址](https://github.com/zequs/learn/tree/master/java-se/se-demo/src/main/java/com/zequs/demo/se/designpattern/philosophy/segregation)
+​		[代码地址](https://github.com/zequs/learn/tree/master/java-se/se-demo/src/main/java/com/zequs/demo/se/designpattern/principle/segregation)

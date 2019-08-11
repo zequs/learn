@@ -1,6 +1,8 @@
 package com.zequs.demo.se.designpattern.pattern.composite;
 
 /**
+ * 组合模式
+ *
  * @author zequs
  * @version $Id: se-demo, v0.1 2019 08 05 Exp $
  */

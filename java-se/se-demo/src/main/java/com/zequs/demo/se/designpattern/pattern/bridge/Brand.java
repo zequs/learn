@@ -1,7 +1,7 @@
 package com.zequs.demo.se.designpattern.pattern.bridge;
 
 /**
- * 品牌
+ * 行为：品牌
  * @author zequs
  * @version $Id: se-demo, v0.1 2019 08 02 Exp $
  */

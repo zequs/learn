@@ -1,6 +1,5 @@
 package com.zequs.demo.se.designpattern.pattern.flyweight;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

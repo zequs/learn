@@ -1,13 +1,16 @@
 package com.zequs.demo.springboot.demo.listener;
 
-import org.springframework.context.ApplicationEvent;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.event.SimpleApplicationEventMulticaster;
 
 /**
  * @author zequs
  * @version $Id: spring-boot-demo, v0.1 2019 07 27 Exp $
  */
+@ComponentScan(basePackages = "com.zequs.demo.springboot.demo.listener")
+@SpringBootApplication
 public class SimpleApplicationEventMulticasterDemo {
     public static void main(String[] args) {
         SimpleApplicationEventMulticaster multicaster = new SimpleApplicationEventMulticaster();
@@ -19,5 +22,6 @@ public class SimpleApplicationEventMulticasterDemo {
         });
 
         multicaster.multicastEvent(new MyEvent("hello world"));
+
     }
 }

@@ -1,6 +1,7 @@
 package com.zequs.demo.se.designpattern.pattern.bridge;
 
 /**
+ * 桥梁
  * @author zequs
  * @version $Id: se-demo, v0.1 2019 08 02 Exp $
  */

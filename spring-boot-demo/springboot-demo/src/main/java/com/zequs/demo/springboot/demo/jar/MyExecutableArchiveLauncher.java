@@ -65,7 +65,7 @@ public abstract class MyExecutableArchiveLauncher extends Launcher {
 
     @Override
     protected List<Archive> getClassPathArchives() throws Exception {
-        MyExecutableArchiveLauncher a = this;
+//        MyExecutableArchiveLauncher a = this;
 //
         /*new Archive.EntryFilter() {
             @Override
@@ -74,9 +74,10 @@ public abstract class MyExecutableArchiveLauncher extends Launcher {
             }
         };*/
 
-        List<Archive> archives = new ArrayList<>(this.archive.getNestedArchives(this::isNestedArchive));
+        /*List<Archive> archives = new ArrayList<>(this.archive.getNestedArchives(this::isNestedArchive));
         postProcessClassPathArchives(archives);
-        return archives;
+        return archives;*/
+        return  null;
     }
 
     /**

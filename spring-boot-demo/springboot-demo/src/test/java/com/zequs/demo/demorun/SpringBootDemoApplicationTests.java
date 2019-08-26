@@ -1,4 +1,4 @@
-package com.zequs.demo.springbootdemo;
+package com.zequs.demo.demorun;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,9 +1,12 @@
 package com.zequs.demo.springboot.demo.bean;
 
+import com.zequs.demo.springboot.demo.model.User;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 @Configuration
+@Import(User.class)
 public class Zequs {
 
     private String name;

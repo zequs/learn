@@ -1,9 +1,6 @@
-package com.zequs.demo.springbootdemo;
+package com.zequs.demo.demorun;
 
 import com.zequs.demo.springboot.demo.bean.Zequs;
-import com.zequs.demo.springboot.demo.listener.ListenerDemo;
-import com.zequs.demo.springboot.demo.listener.TestEvent;
-import com.zequs.demo.springboot.demo.listener.User;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -16,6 +13,8 @@ public class SpringBootDemoApplication {
 	public static void main(String[] args) {
 		ConfigurableApplicationContext context =SpringApplication.run(SpringBootDemoApplication.class, args);
 		Zequs zequs = (Zequs) context.getBean("zequsa");
+		System.out.println("ApplicationName:" + context.getApplicationName());
+		System.out.println("displayName:" + context.getDisplayName());
 		System.out.println(zequs.getName());
 	}
 

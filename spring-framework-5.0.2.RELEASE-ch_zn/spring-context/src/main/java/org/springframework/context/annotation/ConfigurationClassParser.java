@@ -187,6 +187,7 @@ class ConfigurationClassParser {
 	protected final void parse(@Nullable String className, String beanName) throws IOException {
 		Assert.notNull(className, "No bean class name for configuration class bean definition");
 		MetadataReader reader = this.metadataReaderFactory.getMetadataReader(className);
+		//注解解析
 		processConfigurationClass(new ConfigurationClass(reader, beanName));
 	}
 
@@ -238,6 +239,7 @@ class ConfigurationClassParser {
 		// Recursively process the configuration class and its superclass hierarchy.
 		SourceClass sourceClass = asSourceClass(configClass);
 		do {
+			//解析@PropertySources，@ComponentScans，@ImportResource
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass);
 		}
 		while (sourceClass != null);
@@ -280,12 +282,15 @@ class ConfigurationClassParser {
 				!this.conditionEvaluator.shouldSkip(sourceClass.getMetadata(), ConfigurationPhase.REGISTER_BEAN)) {
 			for (AnnotationAttributes componentScan : componentScans) {
 				// The config class is annotated with @ComponentScan -> perform the scan immediately
+
+				//扫描@ComponentScans，@ComponentScan范围有效Bean(@Controller,@Server,@Component,@Re)
 				Set<BeanDefinitionHolder> scannedBeanDefinitions =
 						this.componentScanParser.parse(componentScan, sourceClass.getMetadata().getClassName());
 				// Check the set of scanned definitions for any further config classes and parse recursively if needed
 				for (BeanDefinitionHolder holder : scannedBeanDefinitions) {
 					if (ConfigurationClassUtils.checkConfigurationClassCandidate(
 							holder.getBeanDefinition(), this.metadataReaderFactory)) {
+						//循环解析bean中的注解
 						parse(holder.getBeanDefinition().getBeanClassName(), holder.getBeanName());
 					}
 				}
@@ -293,6 +298,7 @@ class ConfigurationClassParser {
 		}
 
 		// Process any @Import annotations
+		//处理@ImportSelector注解
 		processImports(configClass, sourceClass, getImports(sourceClass), true);
 
 		// Process any @ImportResource annotations

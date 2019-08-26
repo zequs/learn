@@ -91,13 +91,17 @@ import org.springframework.util.Assert;
  */
 public class GenericApplicationContext extends AbstractApplicationContext implements BeanDefinitionRegistry {
 
+	//默认bean工厂
 	private final DefaultListableBeanFactory beanFactory;
 
+	//资源加载器
 	@Nullable
 	private ResourceLoader resourceLoader;
 
+	//自定义类加载器
 	private boolean customClassLoader = false;
 
+	//是否已经刷新
 	private final AtomicBoolean refreshed = new AtomicBoolean();
 
 
@@ -150,12 +154,14 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * the parent of the internal BeanFactory accordingly.
 	 * @see org.springframework.beans.factory.config.ConfigurableBeanFactory#setParentBeanFactory
 	 */
+	//设置父类上下文
 	@Override
 	public void setParent(@Nullable ApplicationContext parent) {
 		super.setParent(parent);
 		this.beanFactory.setParentBeanFactory(getInternalParentBeanFactory());
 	}
 
+	//设置上下文id
 	@Override
 	public void setId(String id) {
 		super.setId(id);
@@ -168,6 +174,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * @since 3.0
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
 	 */
+	//是否允许注册相同名称不同的bean，是：自动替换前者，否：抛出异常
 	public void setAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
 		this.beanFactory.setAllowBeanDefinitionOverriding(allowBeanDefinitionOverriding);
 	}
@@ -180,6 +187,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * @since 3.0
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
 	 */
+	//是否允许循环依赖
 	public void setAllowCircularReferences(boolean allowCircularReferences) {
 		this.beanFactory.setAllowCircularReferences(allowCircularReferences);
 	}
@@ -202,6 +210,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * @see org.springframework.core.io.support.ResourcePatternResolver
 	 * @see #getResources
 	 */
+	//设置资源加载器
 	public void setResourceLoader(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
@@ -216,6 +225,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * falling back to the default superclass behavior else.
 	 * @see #setResourceLoader
 	 */
+	//获取资源加载器
 	@Override
 	public Resource getResource(String location) {
 		if (this.resourceLoader != null) {
@@ -230,6 +240,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * default superclass behavior else.
 	 * @see #setResourceLoader
 	 */
+	//获取资源加载器组
 	@Override
 	public Resource[] getResources(String locationPattern) throws IOException {
 		if (this.resourceLoader instanceof ResourcePatternResolver) {
@@ -237,13 +248,14 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 		}
 		return super.getResources(locationPattern);
 	}
-
+	//设置资源加载器
 	@Override
 	public void setClassLoader(@Nullable ClassLoader classLoader) {
 		super.setClassLoader(classLoader);
 		this.customClassLoader = true;
 	}
 
+	//获取类加载器
 	@Override
 	@Nullable
 	public ClassLoader getClassLoader() {
@@ -272,6 +284,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 		this.beanFactory.setSerializationId(getId());
 	}
 
+	//取消刷新
 	@Override
 	protected void cancelRefresh(BeansException ex) {
 		this.beanFactory.setSerializationId(null);
@@ -282,6 +295,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * Not much to do: We hold a single internal BeanFactory that will never
 	 * get released.
 	 */
+	//关闭bean工厂
 	@Override
 	protected final void closeBeanFactory() {
 		this.beanFactory.setSerializationId(null);
@@ -291,6 +305,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * Return the single internal BeanFactory held by this context
 	 * (as ConfigurableListableBeanFactory).
 	 */
+	//获取bean工厂
 	@Override
 	public final ConfigurableListableBeanFactory getBeanFactory() {
 		return this.beanFactory;
@@ -304,10 +319,12 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * (autodetecting BeanFactoryPostProcessors, etc).
 	 * @return the internal bean factory (as DefaultListableBeanFactory)
 	 */
+	//获取默认可迭代的bean工厂
 	public final DefaultListableBeanFactory getDefaultListableBeanFactory() {
 		return this.beanFactory;
 	}
 
+	//获取能自动装配的bean工厂
 	@Override
 	public AutowireCapableBeanFactory getAutowireCapableBeanFactory() throws IllegalStateException {
 		assertBeanFactoryActive();
@@ -318,7 +335,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	//---------------------------------------------------------------------
 	// Implementation of BeanDefinitionRegistry
 	//---------------------------------------------------------------------
-
+	//注册bean
 	@Override
 	public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition)
 			throws BeanDefinitionStoreException {
@@ -326,31 +343,37 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 		this.beanFactory.registerBeanDefinition(beanName, beanDefinition);
 	}
 
+	//删除bean
 	@Override
 	public void removeBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
 		this.beanFactory.removeBeanDefinition(beanName);
 	}
 
+	//获取bean
 	@Override
 	public BeanDefinition getBeanDefinition(String beanName) throws NoSuchBeanDefinitionException {
 		return this.beanFactory.getBeanDefinition(beanName);
 	}
 
+	//查找bean名称是否被使用
 	@Override
 	public boolean isBeanNameInUse(String beanName) {
 		return this.beanFactory.isBeanNameInUse(beanName);
 	}
 
+	//注册别名
 	@Override
 	public void registerAlias(String beanName, String alias) {
 		this.beanFactory.registerAlias(beanName, alias);
 	}
 
+	//删除别名
 	@Override
 	public void removeAlias(String alias) {
 		this.beanFactory.removeAlias(alias);
 	}
 
+	//判断bean名称是否是别名
 	@Override
 	public boolean isAlias(String beanName) {
 		return this.beanFactory.isAlias(beanName);
@@ -371,6 +394,7 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	 * @since 5.0
 	 * @see #registerBean(String, Class, Supplier, BeanDefinitionCustomizer...)
 	 */
+	//注册bean
 	public final <T> void registerBean(Class<T> beanClass, BeanDefinitionCustomizer... customizers) {
 		registerBean(null, beanClass, null, customizers);
 	}
@@ -424,6 +448,8 @@ public class GenericApplicationContext extends AbstractApplicationContext implem
 	public <T> void registerBean(@Nullable String beanName, Class<T> beanClass, @Nullable Supplier<T> supplier,
 			BeanDefinitionCustomizer... customizers) {
 
+		//bean构建器
+		//ioc容器bean保存的是BeanDefinition对象
 		BeanDefinitionBuilder builder = (supplier != null ?
 				BeanDefinitionBuilder.genericBeanDefinition(beanClass, supplier) :
 				BeanDefinitionBuilder.genericBeanDefinition(beanClass));

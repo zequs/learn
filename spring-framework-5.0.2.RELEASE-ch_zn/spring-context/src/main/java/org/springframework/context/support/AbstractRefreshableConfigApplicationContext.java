@@ -36,12 +36,13 @@ import org.springframework.util.StringUtils;
  * @see #setConfigLocations
  * @see #getDefaultConfigLocations
  */
-public abstract class AbstractRefreshableConfigApplicationContext extends AbstractRefreshableApplicationContext
+	public abstract class AbstractRefreshableConfigApplicationContext extends AbstractRefreshableApplicationContext
 		implements BeanNameAware, InitializingBean {
-
+	//本地配置
 	@Nullable
 	private String[] configLocations;
 
+	//
 	private boolean setIdCalled = false;
 
 
@@ -153,6 +154,7 @@ public abstract class AbstractRefreshableConfigApplicationContext extends Abstra
 	 * Triggers {@link #refresh()} if not refreshed in the concrete context's
 	 * constructor already.
 	 */
+	//激活配置设置
 	@Override
 	public void afterPropertiesSet() {
 		if (!isActive()) {

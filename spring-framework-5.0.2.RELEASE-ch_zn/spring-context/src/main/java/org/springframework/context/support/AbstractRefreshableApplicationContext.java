@@ -64,17 +64,21 @@ import org.springframework.lang.Nullable;
  */
 public abstract class AbstractRefreshableApplicationContext extends AbstractApplicationContext {
 
+	//是否允许bean名称重名覆盖
 	@Nullable
 	private Boolean allowBeanDefinitionOverriding;
 
+	//是否允许循环依赖
 	@Nullable
 	private Boolean allowCircularReferences;
 
 	/** Bean factory for this context */
+	//默认beanFactory
 	@Nullable
 	private DefaultListableBeanFactory beanFactory;
 
 	/** Synchronization monitor for the internal BeanFactory */
+	//同步对象
 	private final Object beanFactoryMonitor = new Object();
 
 
@@ -99,6 +103,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * If not, an exception will be thrown. Default is "true".
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowBeanDefinitionOverriding
 	 */
+	//设置bean名称重名覆盖属性
 	public void setAllowBeanDefinitionOverriding(boolean allowBeanDefinitionOverriding) {
 		this.allowBeanDefinitionOverriding = allowBeanDefinitionOverriding;
 	}
@@ -110,6 +115,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * a circular reference, disallowing them completely.
 	 * @see org.springframework.beans.factory.support.DefaultListableBeanFactory#setAllowCircularReferences
 	 */
+	//设置循环依赖属性
 	public void setAllowCircularReferences(boolean allowCircularReferences) {
 		this.allowCircularReferences = allowCircularReferences;
 	}
@@ -120,6 +126,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * bean factory, shutting down the previous bean factory (if any) and
 	 * initializing a fresh bean factory for the next phase of the context's lifecycle.
 	 */
+	//刷新beanFactory
 	@Override
 	protected final void refreshBeanFactory() throws BeansException {
 		//如果已经有容器，销毁容器中的bean，关闭容器
@@ -144,6 +151,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		}
 	}
 
+	//取消刷新
 	@Override
 	protected void cancelRefresh(BeansException ex) {
 		synchronized (this.beanFactoryMonitor) {
@@ -153,6 +161,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 		super.cancelRefresh(ex);
 	}
 
+	//关闭bean工厂
 	@Override
 	protected final void closeBeanFactory() {
 		synchronized (this.beanFactoryMonitor) {
@@ -167,12 +176,14 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * Determine whether this context currently holds a bean factory,
 	 * i.e. has been refreshed at least once and not been closed yet.
 	 */
+	//是否存在bean工厂
 	protected final boolean hasBeanFactory() {
 		synchronized (this.beanFactoryMonitor) {
 			return (this.beanFactory != null);
 		}
 	}
 
+	//获取bean工厂
 	@Override
 	public final ConfigurableListableBeanFactory getBeanFactory() {
 		synchronized (this.beanFactoryMonitor) {
@@ -224,10 +235,13 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @see DefaultListableBeanFactory#setAllowRawInjectionDespiteWrapping
 	 * @see DefaultListableBeanFactory#setAllowEagerClassLoading
 	 */
+	//自定义bean工厂
 	protected void customizeBeanFactory(DefaultListableBeanFactory beanFactory) {
+		// allowBeanDefinitionOverriding=true ：允许相同key情况下beanDefinition实例的覆盖
 		if (this.allowBeanDefinitionOverriding != null) {
 			beanFactory.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
+		//AllowCircularReferences=false:禁用循环引用
 		if (this.allowCircularReferences != null) {
 			beanFactory.setAllowCircularReferences(this.allowCircularReferences);
 		}
@@ -242,6 +256,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	 * @see org.springframework.beans.factory.support.PropertiesBeanDefinitionReader
 	 * @see org.springframework.beans.factory.xml.XmlBeanDefinitionReader
 	 */
+	//加载bean依赖
 	protected abstract void loadBeanDefinitions(DefaultListableBeanFactory beanFactory)
 			throws BeansException, IOException;
 

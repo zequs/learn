@@ -109,6 +109,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 
 	private boolean setMetadataReaderFactoryCalled = false;
 
+	//BeanDefinitionRegistry的内存地址hashcode转成int类型
+	//postProcessBeanDefinitionRegistry()
 	private final Set<Integer> registriesPostProcessed = new HashSet<>();
 
 	private final Set<Integer> factoriesPostProcessed = new HashSet<>();
@@ -313,6 +315,8 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
+
+			//解析注解的地方
 			parser.parse(candidates);
 			parser.validate();
 

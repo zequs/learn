@@ -4,6 +4,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import pers.zequs.springboot.simple.iimport.demo.annotation.PersonType;
+import pers.zequs.springboot.simple.iimport.demo.importselector.PassengerImportBeanDefinitionRegistrar;
+import pers.zequs.springboot.simple.iimport.demo.importselector.StudentConfigurationSelector;
 import pers.zequs.springboot.simple.iimport.demo.model.Person;
 import pers.zequs.springboot.simple.iimport.demo.model.User;
 
@@ -13,7 +16,10 @@ import pers.zequs.springboot.simple.iimport.demo.model.User;
  */
 @Configuration
 @Import(Person.class)
-public class UserImportConfig {
+//@Import(PassengerImportBeanDefinitionRegistrar.class)
+//@Import(StudentConfigurationSelector.class)
+@PersonType("student")  //这个注解只是为了具有一定的业务逻辑
+public class PersonConfig {
 
     @Bean
     public User user() {

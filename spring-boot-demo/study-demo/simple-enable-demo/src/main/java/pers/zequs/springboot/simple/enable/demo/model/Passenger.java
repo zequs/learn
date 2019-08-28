@@ -1,4 +1,4 @@
-package pers.zequs.springboot.simple.iimport.demo.model;
+package pers.zequs.springboot.simple.enable.demo.model;
 
 import lombok.Data;
 

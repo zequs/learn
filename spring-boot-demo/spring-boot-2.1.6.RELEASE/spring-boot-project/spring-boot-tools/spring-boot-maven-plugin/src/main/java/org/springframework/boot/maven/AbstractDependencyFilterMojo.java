@@ -16,6 +16,12 @@
 
 package org.springframework.boot.maven;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -63,6 +69,13 @@ public abstract class AbstractDependencyFilterMojo extends AbstractMojo {
 	@Parameter(property = "spring-boot.excludeGroupIds", defaultValue = "")
 	private String excludeGroupIds;
 
+	@Parameter(property = "spring-boot.excludeGroupIdsFile", defaultValue = "")
+	private String excludeGroupIdsFile;
+
+	public void setExcludeGroupIdsFile(String excludeGroupIdsFile) {
+		this.excludeGroupIdsFile = excludeGroupIdsFile;
+	}
+
 	protected void setExcludes(List<Exclude> excludes) {
 		this.excludes = excludes;
 	}
@@ -97,6 +110,7 @@ public abstract class AbstractDependencyFilterMojo extends AbstractMojo {
 		for (ArtifactsFilter additionalFilter : additionalFilters) {
 			filters.addFilter(additionalFilter);
 		}
+		excludeGroupIdsFileProcess(filters);
 		filters.addFilter(new MatchingGroupIdFilter(cleanFilterConfig(this.excludeGroupIds)));
 		if (this.includes != null && !this.includes.isEmpty()) {
 			filters.addFilter(new IncludeFilter(this.includes));
@@ -105,6 +119,70 @@ public abstract class AbstractDependencyFilterMojo extends AbstractMojo {
 			filters.addFilter(new ExcludeFilter(this.excludes));
 		}
 		return filters;
+	}
+
+	/**
+	 * 文件处理jar包
+	 * @param filters
+	 */
+	public void excludeGroupIdsFileProcess(FilterArtifacts filters) {
+		if (this.excludeGroupIdsFile != null && this.excludeGroupIdsFile.length() != 0) {
+			File file = new File(this.excludeGroupIdsFile);
+			if (file != null && file.isFile()) {
+				BufferedReader br = null;
+				InputStreamReader isr = null;
+				FileInputStream fis = null;
+				String len = "";
+				StringBuilder stringBuilder = new StringBuilder();
+				try {
+					fis = new FileInputStream(file);
+					isr = new InputStreamReader(fis);
+					br = new BufferedReader(isr);
+					while ((len = br.readLine()) != null) {
+						if (stringBuilder.length() == 0) {
+							stringBuilder.append(len);
+						}
+						else {
+							stringBuilder.append("," + len);
+						}
+					}
+					getLog().info("excludeGroupIds:" + stringBuilder.toString());
+					filters.addFilter(new MatchingGroupIdFilter(cleanFilterConfig(stringBuilder.toString())));
+				}
+				catch (FileNotFoundException ex) {
+					ex.printStackTrace();
+				}
+				catch (IOException ex) {
+					ex.printStackTrace();
+				}
+				finally {
+					if (br != null) {
+						try {
+							br.close();
+						}
+						catch (IOException ex) {
+							ex.printStackTrace();
+						}
+					}
+					if (isr != null) {
+						try {
+							isr.close();
+						}
+						catch (IOException ex) {
+							ex.printStackTrace();
+						}
+					}
+					if (fis != null) {
+						try {
+							fis.close();
+						}
+						catch (IOException ex) {
+							ex.printStackTrace();
+						}
+					}
+				}
+			}
+		}
 	}
 
 	private String cleanFilterConfig(String content) {

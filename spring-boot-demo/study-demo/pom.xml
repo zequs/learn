@@ -20,14 +20,15 @@
     </properties>
 
     <modules>
+		<module>spring-boot-starter-zequsdao</module>
+		<module>slim-demo</module>
         <module>run-demo</module>
-        <module>simple-enable-demo</module>
-        <module>simple-import-demo</module>
-        <module>simple-auto-configuration-demo</module>
-        <module>slim-demo</module>
+        <module>listener-demo</module>
+        <module>enable-demo</module>
+        <module>import-demo</module>
+        <module>auto-configuration-demo</module>
+      
     </modules>
-    <dependencies>
-    </dependencies>
 
     <build>
         <plugins>

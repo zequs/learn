@@ -1,21 +1,22 @@
 package pers.zequs.springboot.run.demo.controller;
 
-import com.google.common.collect.Lists;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import pers.zequs.springboot.run.demo.model.User;
+import pers.zequs.springboot.starter.demo.dao.ZequsDao;
 
 import java.util.List;
 
-/**
- * @author zequs
- * @version $Id: study-demo-parent, v0.1 2019 08 27 Exp $
- */
 @RestController
 public class TestController {
 
+    @Autowired
+    private ZequsDao zequsDao;
+
     @GetMapping("/test")
-    public List<String> test() {
-        List<String> list = Lists.newArrayList("a","b","c","d");
-        return list;
+    public List<User> test() {
+        List<User> users = zequsDao.sql("select * from tb_user", User.class);
+        return users;
     }
 }

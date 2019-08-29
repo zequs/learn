@@ -8,11 +8,12 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>pers.zequs.springboot</groupId>
-	<artifactId>run-demo</artifactId>
+	<artifactId>auto-configuration-demo</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>run-demo</name>
+	<name>auto-configuration-demo</name>
 	<description>Demo project for Spring Boot</description>
 	<packaging>jar</packaging>
+
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -27,27 +28,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>23.0</version>
-		</dependency>
-		<dependency>
-			<groupId>pers.zequs.springboot</groupId>
-			<artifactId>spring-boot-starter-zequsdao</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.8</version>
-			<scope>provided</scope>
-		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>

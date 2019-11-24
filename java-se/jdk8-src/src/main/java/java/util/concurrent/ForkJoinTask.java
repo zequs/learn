@@ -248,12 +248,22 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
      */
 
     /** The run status of this task */
+    /**
+     * 初始态：0
+     * 最终状态都是负数：NORMAL，CANCELLED，EXCEPTIONAL
+     * 正在阻塞的任务设置SIGNAL位
+     */
     volatile int status; // accessed directly by pool and workers
     static final int DONE_MASK   = 0xf0000000;  // mask out non-completion bits
+    //11110000000000000000000000000000(32位，第32位是1，所以是负值)
     static final int NORMAL      = 0xf0000000;  // must be negative
+    //11000000000000000000000000000000（32位，第32位是1，所以是负值）
     static final int CANCELLED   = 0xc0000000;  // must be < NORMAL
+    //二进制 10000000000000000000000000000000（32位，第32位是1，所以是负值）
     static final int EXCEPTIONAL = 0x80000000;  // must be < CANCELLED
+    //二进制10000000000000000(17位)
     static final int SIGNAL      = 0x00010000;  // must be >= 1 << 16
+    //二进制1111111111111111（16位）
     static final int SMASK       = 0x0000ffff;  // short bits for tags
 
     /**
@@ -263,13 +273,16 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
      * @param completion one of NORMAL, CANCELLED, EXCEPTIONAL
      * @return completion status on exit
      */
+    //结束状态就没法设置
     private int setCompletion(int completion) {
         for (int s;;) {
             if ((s = status) < 0)
                 return s;
             if (U.compareAndSwapInt(this, STATUS, s, s | completion)) {
-                if ((s >>> 16) != 0)
+                if ((s >>> 16) != 0) {
+                    //SMASK状态右移动16位=0
                     synchronized (this) { notifyAll(); }
+                }
                 return completion;
             }
         }
@@ -312,9 +325,11 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
      * Blocks a non-worker-thread until completion.
      * @return status upon completion
      */
+    //外部线程等待一个common池中的任务完成
     private int externalAwaitDone() {
         int s;
         ForkJoinPool cp = ForkJoinPool.common;
+        //不是最终状态，最终状态是负数
         if ((s = status) >= 0) {
             if (cp != null) {
                 if (this instanceof CountedCompleter)
@@ -322,9 +337,11 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
                 else if (cp.tryExternalUnpush(this))
                     s = doExec();
             }
+            //status大于0表示尝试帮助完成失败.
             if (s >= 0 && (s = status) >= 0) {
                 boolean interrupted = false;
                 do {
+                    //设置阻塞状态
                     if (U.compareAndSwapInt(this, STATUS, s, s | SIGNAL)) {
                         synchronized (this) {
                             if (status >= 0) {
@@ -383,10 +400,15 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
     private int doJoin() {
         int s; Thread t; ForkJoinWorkerThread wt; ForkJoinPool.WorkQueue w;
         return (s = status) < 0 ? s :
+            //当前线程是否是forkjoin工作线程
             ((t = Thread.currentThread()) instanceof ForkJoinWorkerThread) ?
+            //是：从线程中取出队列，
             (w = (wt = (ForkJoinWorkerThread)t).workQueue).
+            //将当前task出列，执行结果。如果完成则返回结果，
             tryUnpush(this) && (s = doExec()) < 0 ? s :
+            //执行结果没有完成：使用线程池的awaitJoin方法等待结果。
             wt.pool.awaitJoin(w, this) :
+            //当前线程不是ForkJoinWorkerThread,调用externalAwaitDone方法
             externalAwaitDone();
     }
 
@@ -395,6 +417,7 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
      *
      * @return status upon completion
      */
+    //与join区别就是ForkJoinWorkerThread线程池中取出队列执行结果，直接当前线程池中等待结果
     private int doInvoke() {
         int s; Thread t; ForkJoinWorkerThread wt;
         return (s = doExec()) < 0 ? s :
@@ -710,8 +733,10 @@ public abstract class ForkJoinTask<V> implements Future<V>, Serializable {
      */
     public final V join() {
         int s;
-        if ((s = doJoin() & DONE_MASK) != NORMAL)
+        if ((s = doJoin() & DONE_MASK) != NORMAL) {
+            //未完成，说明有异常，取消
             reportException(s);
+        }
         return getRawResult();
     }
 

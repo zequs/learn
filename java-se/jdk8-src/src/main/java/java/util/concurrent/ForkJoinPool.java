@@ -1224,6 +1224,7 @@ public class ForkJoinPool extends AbstractExecutorService {
     private static final int  SMASK      = 0xffff;  // short bits
     private static final int  MAX_CAP    = 0x7fff;  // max #workers - 1
     private static final int  EVENMASK   = 0xfffe;  // even short bits
+    //1111110
     private static final int  SQMASK     = 0x007e;  // max 64 (even) slots
     private static final int  SHORT_SIGN = 1 << 15;
     private static final int  INT_SIGN   = 1 << 31;

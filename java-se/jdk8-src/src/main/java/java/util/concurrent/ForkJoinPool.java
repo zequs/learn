@@ -668,6 +668,7 @@ public class ForkJoinPool extends AbstractExecutorService {
          * share GC bookkeeping (especially cardmarks) such that
          * per-write accesses encounter serious memory contention.
          */
+        //初始队列容量
         static final int INITIAL_QUEUE_CAPACITY = 1 << 13;
 
         /**
@@ -677,22 +678,33 @@ public class ForkJoinPool extends AbstractExecutorService {
          * value a bit less than this to help users trap runaway
          * programs before saturating systems.
          */
+        //最大队列容量
         static final int MAXIMUM_QUEUE_CAPACITY = 1 << 26; // 64M
-
+        //编码的失活计数,负数失效
         volatile int eventCount;   // encoded inactivation count; < 0 if inactive
         int nextWait;              // encoded record of next event waiter
+        //偷取任务数
         int nsteals;               // number of steals
+        //记录偷取者索引，初始为随机索引
         int hint;                  // steal index hint
+
+        //工作线程在ForkJoinPool中工作线程数组中的下标。//偷取队列索引?
         short poolIndex;           // index of this queue in pool
+        //池索引和模式
         final short mode;          // 0: lifo, > 0: fifo, < 0: shared
         volatile int qlock;        // 1: locked, -1: terminate; else 0
+        //下一个poll操作的索引（栈底/队列头）
         volatile int base;         // index of next slot for poll
+        //下一个push操作的索引（栈顶/队列尾）
         int top;                   // index of next slot for push
         ForkJoinTask<?>[] array;   // the elements (initially unallocated)
         final ForkJoinPool pool;   // the containing pool (may be null)
         final ForkJoinWorkerThread owner; // owning thread or null if shared
+        //调用park阻塞期间为owner，其他情况为null
         volatile Thread parker;    // == owner during call to park; else null
+        //记录被join过来的任务
         volatile ForkJoinTask<?> currentJoin;  // task being joined in awaitJoin
+        //记录从其他工作队列偷取过来的任务
         ForkJoinTask<?> currentSteal; // current non-local task being executed
 
         WorkQueue(ForkJoinPool pool, ForkJoinWorkerThread owner, int mode,
@@ -702,12 +714,14 @@ public class ForkJoinPool extends AbstractExecutorService {
             this.mode = (short)mode;
             this.hint = seed; // store initial seed for runWorker
             // Place indices in the center of array (that is not yet allocated)
+            //将索引放置在中心
             base = top = INITIAL_QUEUE_CAPACITY >>> 1;
         }
 
         /**
          * Returns the approximate number of tasks in the queue.
          */
+        //返回队列的大约任务数
         final int queueSize() {
             int n = base - top;       // non-owner callers must read base first
             return (n >= 0) ? 0 : -n; // ignore transient negative
@@ -754,6 +768,7 @@ public class ForkJoinPool extends AbstractExecutorService {
          * by owner or with lock held -- it is OK for base, but not
          * top, to move while resizings are in progress.
          */
+        //扩容
         final ForkJoinTask<?>[] growArray() {
             ForkJoinTask<?>[] oldA = array;
             int size = oldA != null ? oldA.length << 1 : INITIAL_QUEUE_CAPACITY;
@@ -781,6 +796,7 @@ public class ForkJoinPool extends AbstractExecutorService {
          * Takes next task, if one exists, in LIFO order.  Call only
          * by owner in unshared queues.
          */
+        //LIFO方式出栈
         final ForkJoinTask<?> pop() {
             ForkJoinTask<?>[] a; ForkJoinTask<?> t; int m;
             if ((a = array) != null && (m = a.length - 1) >= 0) {
@@ -818,6 +834,7 @@ public class ForkJoinPool extends AbstractExecutorService {
         /**
          * Takes next task, if one exists, in FIFO order.
          */
+        //FIFO方式出队列
         final ForkJoinTask<?> poll() {
             ForkJoinTask<?>[] a; int b; ForkJoinTask<?> t;
             while ((b = base) - top < 0 && (a = array) != null) {
@@ -841,6 +858,7 @@ public class ForkJoinPool extends AbstractExecutorService {
         /**
          * Takes next task, if one exists, in order specified by mode.
          */
+        //mode的值决定是LIFO还是FIFO
         final ForkJoinTask<?> nextLocalTask() {
             return mode == 0 ? pop() : poll();
         }
@@ -887,6 +905,7 @@ public class ForkJoinPool extends AbstractExecutorService {
         /**
          * Polls and runs tasks until empty.
          */
+        //轮询并运行任务，直到清空。
         final void pollAndExecAll() {
             for (ForkJoinTask<?> t; (t = poll()) != null;)
                 t.doExec();
@@ -1213,6 +1232,20 @@ public class ForkJoinPool extends AbstractExecutorService {
      * Staleness of read-only operations on the workQueues array can
      * be checked by comparing plock before vs after the reads.
      */
+    /**
+     * AC: 表示当前活动的工作线程的数量减去并行度得到的数值。(16 bits)
+     * TC: 表示全部工作线程的数量减去并行度得到的数值。(16bits)
+     * ST: 表示当前ForkJoinPool是否正在关闭。(1 bit)
+     * EC: 表示Treiber stack顶端的等待工作线程的等待次数。(15 bits)
+     * ID: Treiber stack顶端的等待工作线程的下标取反(16 bits)
+     * 1111111111111111 1111111111111111  1  111111111111111 1111111111111111
+     *  AC               TC                ST EC              ID
+     *
+     * 如果AC为负数，说明没有足够的活动工作线程。
+     * 如果TC为负数，说明工作线程数量没达到最大工作线程数量。
+     * 如果ID为负数，说明至少有一个等待的工作线程。
+     * 如果(int)ctl为负数，说明ForkJoinPool正在关闭。
+     */
 
     // bit positions/shifts for fields
     private static final int  AC_SHIFT   = 48;
@@ -1221,32 +1254,51 @@ public class ForkJoinPool extends AbstractExecutorService {
     private static final int  EC_SHIFT   = 16;
 
     // bounds
+    //1111111111111111(16)
     private static final int  SMASK      = 0xffff;  // short bits
+    //111111111111111(15)
     private static final int  MAX_CAP    = 0x7fff;  // max #workers - 1
+    //1111111111111110(16位)
     private static final int  EVENMASK   = 0xfffe;  // even short bits
+    //1111110(7)
     private static final int  SQMASK     = 0x007e;  // max 64 (even) slots
+    //100000000000000
     private static final int  SHORT_SIGN = 1 << 15;
+    //100000000000000000000000000000
     private static final int  INT_SIGN   = 1 << 31;
 
     // masks
+    //100000000000000000000000000000
     private static final long STOP_BIT   = 0x0001L << ST_SHIFT;
+    //1111111111111111000...(省略45个0整个64位16个1+48个0)
     private static final long AC_MASK    = ((long)SMASK) << AC_SHIFT;
+    //16个1+32个0
     private static final long TC_MASK    = ((long)SMASK) << TC_SHIFT;
 
     // units for incrementing and decrementing
+    //1+32个0
     private static final long TC_UNIT    = 1L << TC_SHIFT;
+    //1+48个0
     private static final long AC_UNIT    = 1L << AC_SHIFT;
 
     // masks and units for dealing with u = (int)(ctl >>> 32)
+    //16
     private static final int  UAC_SHIFT  = AC_SHIFT - 32;
+    //0
     private static final int  UTC_SHIFT  = TC_SHIFT - 32;
+    //16个1+16个0
     private static final int  UAC_MASK   = SMASK << UAC_SHIFT;
+    //16个1
     private static final int  UTC_MASK   = SMASK << UTC_SHIFT;
+    //1+16个0
     private static final int  UAC_UNIT   = 1 << UAC_SHIFT;
+    //1
     private static final int  UTC_UNIT   = 1 << UTC_SHIFT;
 
     // masks and units for dealing with e = (int)ctl
+    //31个1
     private static final int E_MASK      = 0x7fffffff; // no STOP_BIT
+    //16个1
     private static final int E_SEQ       = 1 << EC_SHIFT;
 
     // plock bits
@@ -1265,7 +1317,9 @@ public class ForkJoinPool extends AbstractExecutorService {
     volatile long ctl;                         // main pool control
     volatile int plock;                        // shutdown status and seqLock
     volatile int indexSeed;                    // worker/submitter index seed
+    //并行度
     final short parallelism;                   // parallelism level
+    //队列模式
     final short mode;                          // LIFO/FIFO
     WorkQueue[] workQueues;                    // main registry
     final ForkJoinWorkerThreadFactory factory;

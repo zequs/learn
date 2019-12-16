@@ -669,6 +669,7 @@ public class ForkJoinPool extends AbstractExecutorService {
          * per-write accesses encounter serious memory contention.
          */
         //初始队列容量
+        //8192
         static final int INITIAL_QUEUE_CAPACITY = 1 << 13;
 
         /**
@@ -1233,11 +1234,11 @@ public class ForkJoinPool extends AbstractExecutorService {
      * be checked by comparing plock before vs after the reads.
      */
     /**
-     * AC: 表示当前活动的工作线程的数量减去并行度得到的数值。(16 bits)
-     * TC: 表示全部工作线程的数量减去并行度得到的数值。(16bits)
+     * AC: 表示当前活动的工作线程的数量减去并行度得到的数值(16 bits)。如果是负数，说明活跃工作线程数不够，当正在运行的工作线程数小于parallelism。
+     * TC: 表示全部工作线程的数量减去并行度得到的数值(16bits)。负数,说明工作线程数不够。
      * ST: 表示当前ForkJoinPool是否正在关闭。(1 bit)
-     * EC: 表示Treiber stack顶端的等待工作线程的等待次数。(15 bits)
-     * ID: Treiber stack顶端的等待工作线程的下标取反(16 bits)
+     * EC: 表示Treiber stack(栈) 顶端的等待工作线程的等待次数。(15 bits)
+     * ID: 保存了一个workQueue在workQueue[]的下标SP：sp=(int)ctl,当sp非0，为负数代表存在空闲worker(16 bits)。
      * 1111111111111111 1111111111111111  1  111111111111111 1111111111111111
      *  AC               TC                ST EC              ID
      *
@@ -1314,13 +1315,18 @@ public class ForkJoinPool extends AbstractExecutorService {
 
     // Instance fields
     volatile long stealCount;                  // collects worker counts
+    //  1111111111111111 1111111111111111  1  111111111111111 1111111111111111
+    //  AC               TC                ST EC              ID
     volatile long ctl;                         // main pool control
+    //状态：SHUTDOWN，PL_LOCK，PL_SIGNAL，PL_SPINS
     volatile int plock;                        // shutdown status and seqLock
     volatile int indexSeed;                    // worker/submitter index seed
     //并行度
     final short parallelism;                   // parallelism level
     //队列模式
     final short mode;                          // LIFO/FIFO
+    //workQueue数组，每个worker都有一个自己独立的workQueue，但不是每个workQueue都有自己的worker，
+    // 这样的workQueue叫submission queue,放在偶数位，push的时候会对workQueues上锁
     WorkQueue[] workQueues;                    // main registry
     final ForkJoinWorkerThreadFactory factory;
     final UncaughtExceptionHandler ueh;        // per-worker UEH
@@ -1413,6 +1419,7 @@ public class ForkJoinPool extends AbstractExecutorService {
      * @param wt the worker thread
      * @return the worker's queue
      */
+    //创建worker
     final WorkQueue registerWorker(ForkJoinWorkerThread wt) {
         UncaughtExceptionHandler handler; WorkQueue[] ws; int s, ps;
         wt.setDaemon(true);
@@ -1462,6 +1469,7 @@ public class ForkJoinPool extends AbstractExecutorService {
      * @param wt the worker thread, or null if construction failed
      * @param ex the exception causing failure, or null if none
      */
+    //注销worker
     final void deregisterWorker(ForkJoinWorkerThread wt, Throwable ex) {
         WorkQueue w = null;
         if (wt != null && (w = wt.workQueue) != null) {
@@ -1532,13 +1540,18 @@ public class ForkJoinPool extends AbstractExecutorService {
      *
      * @param task the task. Caller must ensure non-null.
      */
+    //外部task添加到队列，放入的workQueues的偶数下标
     final void externalPush(ForkJoinTask<?> task) {
         WorkQueue q; int m, s, n, am; ForkJoinTask<?>[] a;
+        //第一次调用，r没进行初始化，=0，直接调fullExternalPush()进行初始化
         int r = ThreadLocalRandom.getProbe();
         int ps = plock;
         WorkQueue[] ws = workQueues;
         if (ps > 0 && ws != null && (m = (ws.length - 1)) >= 0 &&
+            // SQMASK二进制1111110，任何数&偶数结果都是偶数，
+            // 所以q是workQueues偶数位的WorkQueue，既submission queue（不是worker创建），来自外部提交
             (q = ws[m & r & SQMASK]) != null && r != 0 &&
+            //上锁
             U.compareAndSwapInt(q, QLOCK, 0, 1)) { // lock
             if ((a = q.array) != null &&
                 (am = a.length - 1) > (n = (s = q.top) - q.base)) {
@@ -1572,9 +1585,11 @@ public class ForkJoinPool extends AbstractExecutorService {
      * eventually wrap around zero, this method harmlessly fails to
      * reinitialize if workQueues exists, while still advancing plock.
      */
+    //完整版的externalPush,可进行一些辅助初始化
     private void fullExternalPush(ForkJoinTask<?> task) {
         int r;
         if ((r = ThreadLocalRandom.getProbe()) == 0) {
+            //初始化
             ThreadLocalRandom.localInit();
             r = ThreadLocalRandom.getProbe();
         }
@@ -1589,6 +1604,7 @@ public class ForkJoinPool extends AbstractExecutorService {
                 int n = (p > 1) ? p - 1 : 1;    // ensure at least 2 slots
                 n |= n >>> 1; n |= n >>> 2;  n |= n >>> 4;
                 n |= n >>> 8; n |= n >>> 16; n = (n + 1) << 1;
+                //初始化WorkQueue[]
                 WorkQueue[] nws = ((ws = workQueues) == null || ws.length == 0 ?
                                    new WorkQueue[n] : null);
                 if (((ps = plock) & PL_LOCK) != 0 ||
@@ -1660,6 +1676,7 @@ public class ForkJoinPool extends AbstractExecutorService {
      * @param ws the worker array to use to find signallees
      * @param q if non-null, the queue holding tasks to be processed
      */
+    //尝试活激活worker
     final void signalWork(WorkQueue[] ws, WorkQueue q) {
         for (;;) {
             long c; int e, u, i; WorkQueue w; Thread p;
@@ -1730,15 +1747,20 @@ public class ForkJoinPool extends AbstractExecutorService {
                 WorkQueue q; int b, e; ForkJoinTask<?>[] a; ForkJoinTask<?> t;
                 if ((q = ws[(r - j) & m]) != null &&
                     (b = q.base) - q.top < 0 && (a = q.array) != null) {
+                    //a = q.array,数组扩容都是按照n<<1扩容（扩容在growArray()方法）。
+                    //a.length - 1。二级制01111...111（前面是0，之后全是1）&b。1开始位都是b的值。
                     long i = (((a.length - 1) & b) << ASHIFT) + ABASE;
                     if ((t = ((ForkJoinTask<?>)
                               U.getObjectVolatile(a, i))) != null) {
+                        // ec 是小偷的 eventCount，大于0代表当前的worker是激活的
                         if (ec < 0)
                             helpRelease(c, ws, w, q, b);
+                        // 把 task 从 队列中取出来，然后队列的base +1，如果被窃取的队列中有多于1个的task，则尝试唤醒其他的worker
                         else if (q.base == b &&
                                  U.compareAndSwapObject(a, i, t, null)) {
                             U.putOrderedInt(q, QBASE, b + 1);
                             if ((b + 1) - q.top < 0)
+                                //激活work
                                 signalWork(ws, q);
                             w.runTask(t);
                         }
@@ -2894,9 +2916,11 @@ public class ForkJoinPool extends AbstractExecutorService {
      *
      * @return the next submission, or {@code null} if none
      */
+    //submission task。workQueues偶数下标，表示不是Forkjointhead线程创建的任务（没有worker的workQueue，如main函数创建的）叫做submission
     protected ForkJoinTask<?> pollSubmission() {
         WorkQueue[] ws; WorkQueue w; ForkJoinTask<?> t;
         if ((ws = workQueues) != null) {
+            //偶数下标
             for (int i = 0; i < ws.length; i += 2) {
                 if ((w = ws[i]) != null && (t = w.poll()) != null)
                     return t;

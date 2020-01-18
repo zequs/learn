@@ -378,15 +378,20 @@ public class SpringApplication {
 
 	private void prepareContext(ConfigurableApplicationContext context, ConfigurableEnvironment environment,
 			SpringApplicationRunListeners listeners, ApplicationArguments applicationArguments, Banner printedBanner) {
+		//设置spring应用上下文
 		context.setEnvironment(environment);
+		//spring应用上下文后置处理
 		postProcessApplicationContext(context);
+		//上下文初始化器
 		applyInitializers(context);
+		//spring应用上下文创建并准备完毕回调
 		listeners.contextPrepared(context);
 		if (this.logStartupInfo) {
 			logStartupInfo(context.getParent() == null);
 			logStartupProfileInfo(context);
 		}
 		// Add boot specific singleton beans
+		//注册spring boot bean(springApplicationArguments,springBootBanner)
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 		beanFactory.registerSingleton("springApplicationArguments", applicationArguments);
 		if (printedBanner != null) {
@@ -397,9 +402,12 @@ public class SpringApplication {
 					.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
 		// Load the sources
+		//合并spring应用上下文配置源
 		Set<Object> sources = getAllSources();
 		Assert.notEmpty(sources, "Sources must not be empty");
+		//加载spring应用上下文配置源
 		load(context, sources.toArray(new Object[0]));
+		//事件加载完毕回调
 		listeners.contextLoaded(context);
 	}
 

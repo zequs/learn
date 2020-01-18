@@ -381,18 +381,23 @@ public abstract class AbstractQueuedSynchronizer
         /** Marker to indicate a node is waiting in shared mode */
         static final Node SHARED = new Node();
         /** Marker to indicate a node is waiting in exclusive mode */
+        // 独占模式下等待的标记
         static final Node EXCLUSIVE = null;
 
         /** waitStatus value to indicate thread has cancelled */
+        //取消
         static final int CANCELLED =  1;
         /** waitStatus value to indicate successor's thread needs unparking */
+        //等待触发
         static final int SIGNAL    = -1;
         /** waitStatus value to indicate thread is waiting on condition */
+        //等待条件
         static final int CONDITION = -2;
         /**
          * waitStatus value to indicate the next acquireShared should
          * unconditionally propagate
          */
+        //状态需要向后传播
         static final int PROPAGATE = -3;
 
         /**
@@ -491,6 +496,7 @@ public abstract class AbstractQueuedSynchronizer
          *
          * @return the predecessor of this node
          */
+        //返回前一个节点
         final Node predecessor() throws NullPointerException {
             Node p = prev;
             if (p == null)
@@ -1935,6 +1941,7 @@ public abstract class AbstractQueuedSynchronizer
          *         returns {@code false}
          */
         public final void signal() {
+            //是否是获取锁的线程，看实现类Sync class
             if (!isHeldExclusively())
                 throw new IllegalMonitorStateException();
             Node first = firstWaiter;

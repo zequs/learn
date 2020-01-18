@@ -202,6 +202,10 @@ public class RepackageMojo extends AbstractDependencyFilterMojo {
 	@Parameter(defaultValue = "false")
 	public boolean includeSystemScope;
 
+	@Parameter(property = "spring-boot.excludeGroupIdsFiles", defaultValue = "")
+	private String excludeGroupIdsFiles;
+
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (this.project.getPackaging().equals("pom")) {
@@ -215,6 +219,39 @@ public class RepackageMojo extends AbstractDependencyFilterMojo {
 		repackage();
 	}
 
+	/*public void aa() {
+		if (this.excludeGroupIdsFiles != null && this.excludeGroupIdsFiles.length() != 0) {
+			File file = new File(this.excludeGroupIdsFiles);
+			if (file.isFile()) {
+				FileReader fileReader = null;
+				BufferedReader br = null;
+				StringBuffer groupIdsBuffer =  new StringBuffer();
+				String line = "";
+				try {
+					fileReader = new FileReader(this.excludeGroupIdsFiles);
+					br = new BufferedReader(fileReader);
+					while ((line = br.readLine()) != null) {
+						if (groupIdsBuffer.length() != 0) {
+							groupIdsBuffer.append(line);
+						}
+						else {
+							groupIdsBuffer.append("," + line);
+						}
+					}
+				}
+				catch (FileNotFoundException ex) {
+					ex.printStackTrace();
+				}
+				catch (IOException ex) {
+					ex.printStackTrace();
+				}
+
+			}
+			else {
+				getLog().error("excludeGroupIdsFiles is not file");
+			}
+		}
+	}*/
 	private void repackage() throws MojoExecutionException {
 		Artifact source = getSourceArtifact();
 		File target = getTargetFile();
@@ -363,6 +400,7 @@ public class RepackageMojo extends AbstractDependencyFilterMojo {
 		}
 
 	}
+
 
 	/**
 	 * Archive layout types.

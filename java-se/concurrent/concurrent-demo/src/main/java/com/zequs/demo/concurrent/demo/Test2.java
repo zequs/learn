@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author zequs
- * @version $Id: concurrent-demo, v0.1 2019 07 24 Exp $
+ * @version $Id: concurrent-Demo, v0.1 2019 07 24 Exp $
  */
 public class Test2 {
     public static void main(String[] args) {

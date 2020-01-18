@@ -1,5 +1,7 @@
 package com.zequs.demo.concurrent.demo;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -10,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * @author zequs
- * @version $Id: concurrent-demo, v0.1 2019 07 24 Exp $
+ * @version $Id: concurrent-Demo, v0.1 2019 07 24 Exp $
  */
 public class Test {
     public static void main(String[] args) {
@@ -27,15 +29,14 @@ public class Test {
         MyThread myThreadD = new MyThread(countDownLatch,"MyD");
         MyThread myThreadE = new MyThread(countDownLatch,"MyE");
         SubThread subThread = new SubThread(countDownLatch,"sub");
-
-
         services.execute(myThreadA);
         services.execute(myThreadB);
         services.execute(myThreadC);
         services.execute(myThreadD);
         services.execute(myThreadE);
-
         new Thread(new SubThread(countDownLatch,"aa")).start();
+        List list = new ArrayList();
+        list.stream()
     }
 
 }

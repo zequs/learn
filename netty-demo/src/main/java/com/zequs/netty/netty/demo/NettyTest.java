@@ -30,13 +30,19 @@ public class NettyTest {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             //ch.pipeline().addLast();
+                            System.out.println(11);
                         }
                     });
-            ChannelFuture future = serverBoot.bind(8888).sync();
+            ChannelFuture future = serverBoot.bind(port).sync();
             future.channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
             workGroup.shutdownGracefully();
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        NettyTest test = new NettyTest();
+        test.openServer(8084);
     }
 }

@@ -131,4 +131,20 @@ public class StreamTest {
         // new String[](i)的缩写 i具体数字
         String[] dd1 = strs.stream().toArray(String[]::new);
     }
+
+
+    /**
+     * reduce有3个重载方法
+     * 一个参数
+     * Optional<T> reduce(BinaryOperator<T> accumulator)
+     * 两个参数
+     * T reduce(T identity, BinaryOperator<T> accumulator);
+     * 三个参数
+     * <U> U reduce(U identity,
+     *                  BiFunction<U, ? super T, U> accumulator,
+     *                  BinaryOperator<U> combiner);
+     */
+    public static void reduce() {
+
+    }
 }

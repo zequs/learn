@@ -381,13 +381,16 @@ public abstract class AbstractQueuedSynchronizer
         /** Marker to indicate a node is waiting in shared mode */
         static final Node SHARED = new Node();
         /** Marker to indicate a node is waiting in exclusive mode */
+        //node模式，分享还是独占
         static final Node EXCLUSIVE = null;
 
         /** waitStatus value to indicate thread has cancelled */
         static final int CANCELLED =  1;
         /** waitStatus value to indicate successor's thread needs unparking */
+        //-1表示此线程需要释放
         static final int SIGNAL    = -1;
         /** waitStatus value to indicate thread is waiting on condition */
+        //线程正在等待
         static final int CONDITION = -2;
         /**
          * waitStatus value to indicate the next acquireShared should
@@ -429,6 +432,7 @@ public abstract class AbstractQueuedSynchronizer
          * CONDITION for condition nodes.  It is modified using CAS
          * (or when possible, unconditional volatile writes).
          */
+        //状态
         volatile int waitStatus;
 
         /**
@@ -442,6 +446,7 @@ public abstract class AbstractQueuedSynchronizer
          * cancelled thread never succeeds in acquiring, and a thread only
          * cancels itself, not any other node.
          */
+        //双向链表前置节点
         volatile Node prev;
 
         /**
@@ -457,12 +462,14 @@ public abstract class AbstractQueuedSynchronizer
          * point to the node itself instead of null, to make life
          * easier for isOnSyncQueue.
          */
+        //双向链表后置节点
         volatile Node next;
 
         /**
          * The thread that enqueued this node.  Initialized on
          * construction and nulled out after use.
          */
+        //当前线程
         volatile Thread thread;
 
         /**
@@ -580,11 +587,10 @@ public abstract class AbstractQueuedSynchronizer
 
     /**
      * Inserts node into queue, initializing if necessary. See picture above.
-     * 将节点插入队列，必要时进行初始化
+     * 将节点插入队列，必要时进行初始化。返回插入前tail节点
      * @param node the node to insert
      * @return node's predecessor
      */
-    //返回当前节点的前节点，也所以说是加入之前的等待队列的tail节点
     private Node enq(final Node node) {
         for (;;) {
             Node t = tail;
@@ -607,6 +613,7 @@ public abstract class AbstractQueuedSynchronizer
      * @param mode Node.EXCLUSIVE for exclusive, Node.SHARED for shared
      * @return the new node
      */
+    //插入等待队列
     private Node addWaiter(Node mode) {
         Node node = new Node(Thread.currentThread(), mode);
         // Try the fast path of enq; backup to full enq on failure
@@ -620,6 +627,7 @@ public abstract class AbstractQueuedSynchronizer
             }
         }
         //enq()设置head节点
+        //上面是一次配置，下面方法是for死循环或初始化
         enq(node);
         return node;
     }

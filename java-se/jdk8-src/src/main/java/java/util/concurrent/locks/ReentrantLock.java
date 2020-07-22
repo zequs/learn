@@ -215,12 +215,14 @@ public class ReentrantLock implements Lock, java.io.Serializable {
     }
 
     /**
+     * 公平锁
      * Sync object for fair locks
      */
     static final class FairSync extends Sync {
         private static final long serialVersionUID = -3000897897090466540L;
 
         final void lock() {
+            //公平锁没有第一时间去抢锁
             acquire(1);
         }
 
@@ -233,6 +235,7 @@ public class ReentrantLock implements Lock, java.io.Serializable {
             //c=0 无锁，>0 被锁
             int c = getState();
             if (c == 0) {
+                //hasQueuedPredecessors判断等待队列是否有值，否代表空，就可以抢占锁
                 if (!hasQueuedPredecessors() &&
                     compareAndSetState(0, acquires)) {
                     setExclusiveOwnerThread(current);

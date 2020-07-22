@@ -23,5 +23,6 @@ public class MyThread implements Runnable {
             e.printStackTrace();
         }
         downLatch.countDown();
+        System.out.println("结束");
     }
 }

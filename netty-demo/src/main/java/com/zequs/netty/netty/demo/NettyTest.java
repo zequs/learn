@@ -9,6 +9,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.util.AttributeKey;
+import io.netty.util.NettyRuntime;
 
 /**
  * @author zequs
@@ -16,6 +17,7 @@ import io.netty.util.AttributeKey;
  */
 public class NettyTest {
     public void openServer(int port) throws Exception {
+        TestInterface[] testInterface = new TestInterface[5];
 
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);// parent group
         EventLoopGroup workGroup = new NioEventLoopGroup();// child group
@@ -32,11 +34,17 @@ public class NettyTest {
                             //ch.pipeline().addLast();
                         }
                     });
-            ChannelFuture future = serverBoot.bind(8888).sync();
+            ChannelFuture future = serverBoot.bind(port).sync();
             future.channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();
             workGroup.shutdownGracefully();
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        System.out.println(NettyRuntime.availableProcessors());
+        NettyTest test = new NettyTest();
+//        test.openServer(8084);
     }
 }

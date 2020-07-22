@@ -1,7 +1,5 @@
 package com.zequs.demo.se.Test;
 
-import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**

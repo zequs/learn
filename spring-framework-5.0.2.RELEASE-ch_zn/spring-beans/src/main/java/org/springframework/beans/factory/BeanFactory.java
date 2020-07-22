@@ -123,6 +123,7 @@ public interface BeanFactory {
 	 */
 	//对FactoryBean的转义定义，因为如果使用bean的名字检索FactoryBean得到的对象是工厂生成的对象，
 	//如果需要得到工厂本身，需要转义
+	//spring容器相关的类也是交给自己管理的，这些类的bean名称都会使用&符号
 	String FACTORY_BEAN_PREFIX = "&";
 
 

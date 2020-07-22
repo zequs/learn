@@ -186,6 +186,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 				if (node instanceof Element) {
 					Element ele = (Element) node;
 					//Bean定义的Document的元素节点使用的是Spring默认的XML命名空间
+
 					if (delegate.isDefaultNamespace(ele)) {
 						//使用Spring的Bean规则解析元素节点
 						parseDefaultElement(ele, delegate);
@@ -241,7 +242,7 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		}
 
 		// Resolve system properties: e.g. "${user.dir}"
-		//使用系统变量值解析location属性值
+		//使用系统变量值解析location属性值，如果有占位符的话，会进行解析
 		location = getReaderContext().getEnvironment().resolveRequiredPlaceholders(location);
 
 		Set<Resource> actualResources = new LinkedHashSet<>(4);

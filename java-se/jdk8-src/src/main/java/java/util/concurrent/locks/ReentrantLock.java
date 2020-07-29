@@ -129,13 +129,16 @@ public class ReentrantLock implements Lock, java.io.Serializable {
         final boolean nonfairTryAcquire(int acquires) {
             final Thread current = Thread.currentThread();
             int c = getState();
+            //如果state = 0，再去尝试一下
             if (c == 0) {
                 if (compareAndSetState(0, acquires)) {
                     setExclusiveOwnerThread(current);
                     return true;
                 }
             }
+            //说明当前线程已经获取锁了，重入锁功能
             else if (current == getExclusiveOwnerThread()) {
+                //state加acquires
                 int nextc = c + acquires;
                 if (nextc < 0) // overflow
                     throw new Error("Maximum lock count exceeded");
@@ -145,8 +148,9 @@ public class ReentrantLock implements Lock, java.io.Serializable {
             return false;
         }
 
-        protected final boolean     tryRelease(int releases) {
+        protected final boolean tryRelease(int releases) {
             int c = getState() - releases;
+            //不是锁所占的线程就抛出异常
             if (Thread.currentThread() != getExclusiveOwnerThread())
                 throw new IllegalMonitorStateException();
             boolean free = false;
@@ -194,6 +198,7 @@ public class ReentrantLock implements Lock, java.io.Serializable {
 
     /**
      * Sync object for non-fair locks
+     * 非公平
      */
     static final class NonfairSync extends Sync {
         private static final long serialVersionUID = 7316153563782823691L;
@@ -201,9 +206,13 @@ public class ReentrantLock implements Lock, java.io.Serializable {
         /**
          * Performs lock.  Try immediate barge, backing up to normal
          * acquire on failure.
+         * 获取锁
          */
         final void lock() {
+            //cas设置，能设置成功就表示获取了锁，相同与set state = 1 where state = 0。
+            //公平和不公平就体现在这，非公平进来就去尝试一下获取锁，公平锁先看有没有等待队列，有就直接插入到队列中
             if (compareAndSetState(0, 1))
+                //设置独占锁
                 setExclusiveOwnerThread(Thread.currentThread());
             else
                 acquire(1);

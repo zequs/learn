@@ -678,6 +678,7 @@ public abstract class AbstractQueuedSynchronizer
         }
         //唤醒
         if (s != null)
+            //获取下一个node节点获取锁
             LockSupport.unpark(s.thread);
     }
 
@@ -1227,8 +1228,11 @@ public abstract class AbstractQueuedSynchronizer
      * @param arg the acquire argument.  This value is conveyed to
      *        {@link #tryAcquire} but is otherwise uninterpreted and
      *        can represent anything you like.
+     *  等待队列
      */
     public final void acquire(int arg) {
+        //tryAcquire 尝试获取锁
+        //acquireQueued
         if (!tryAcquire(arg) &&
             acquireQueued(addWaiter(Node.EXCLUSIVE), arg))
             selfInterrupt();
@@ -2075,7 +2079,9 @@ public abstract class AbstractQueuedSynchronizer
         public final void await() throws InterruptedException {
             if (Thread.interrupted())
                 throw new InterruptedException();
+            //添加condition队列
             Node node = addConditionWaiter();
+            //完全释放锁
             int savedState = fullyRelease(node);
             int interruptMode = 0;
             while (!isOnSyncQueue(node)) {
@@ -2301,7 +2307,9 @@ public abstract class AbstractQueuedSynchronizer
      * otherwise be done with atomic field updaters).
      */
     private static final Unsafe unsafe = Unsafe.getUnsafe();
+    //状态偏移量
     private static final long stateOffset;
+    //head偏移量
     private static final long headOffset;
     private static final long tailOffset;
     private static final long waitStatusOffset;

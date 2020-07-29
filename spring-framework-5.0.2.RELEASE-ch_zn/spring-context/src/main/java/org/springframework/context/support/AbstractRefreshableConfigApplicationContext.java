@@ -84,6 +84,7 @@ import org.springframework.util.StringUtils;
 			this.configLocations = new String[locations.length];
 			for (int i = 0; i < locations.length; i++) {
 				// resolvePath为同一个类中将字符串解析为路径的方法
+				// 具体请看PropertyPlaceholderHelper#parseStringValue()
 				this.configLocations[i] = resolvePath(locations[i]).trim();
 			}
 		}

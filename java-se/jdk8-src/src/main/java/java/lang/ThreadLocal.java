@@ -295,6 +295,7 @@ public class ThreadLocal<T> {
      * used, stale entries are guaranteed to be removed only when
      * the table starts running out of space.
      */
+    //内部类
     static class ThreadLocalMap {
 
         /**
@@ -305,6 +306,8 @@ public class ThreadLocal<T> {
          * entry can be expunged from table.  Such entries are referred to
          * as "stale entries" in the code that follows.
          */
+        //WeakReference 使用的是弱引用，内存不足时key会被垃圾回收器回收，
+        //Entry 内部类中的内部类
         static class Entry extends WeakReference<ThreadLocal<?>> {
             /** The value associated with this ThreadLocal. */
             Object value;
@@ -317,12 +320,14 @@ public class ThreadLocal<T> {
 
         /**
          * The initial capacity -- MUST be a power of two.
+         * 初始容器大小
          */
         private static final int INITIAL_CAPACITY = 16;
 
         /**
          * The table, resized as necessary.
          * table.length MUST always be a power of two.
+         * 容器
          */
         private Entry[] table;
 
@@ -333,6 +338,7 @@ public class ThreadLocal<T> {
 
         /**
          * The next size value at which to resize.
+         *
          */
         private int threshold; // Default to 0
 

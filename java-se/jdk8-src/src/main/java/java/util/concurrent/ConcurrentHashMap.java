@@ -1025,15 +1025,18 @@ public class ConcurrentHashMap<K,V> extends AbstractMap<K,V>
             else {
                 V oldVal = null;
                 synchronized (f) {
+                    //双重检查
                     if (tabAt(tab, i) == f) {
                         if (fh >= 0) {
                             binCount = 1;
                             for (Node<K,V> e = f;; ++binCount) {
                                 K ek;
+                                //相同的Key覆盖value
                                 if (e.hash == hash &&
                                     ((ek = e.key) == key ||
                                      (ek != null && key.equals(ek)))) {
                                     oldVal = e.val;
+                                    //配置项，key相同是否能覆盖value
                                     if (!onlyIfAbsent)
                                         e.val = value;
                                     break;

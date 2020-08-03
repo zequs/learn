@@ -1854,7 +1854,9 @@ public abstract class AbstractQueuedSynchronizer
         private Node addConditionWaiter() {
             Node t = lastWaiter;
             // If lastWaiter is cancelled, clean out.
+            //最后一个节点条件满足的才会进行清除处理
             if (t != null && t.waitStatus != Node.CONDITION) {
+                //排除t.waitStatus不是CONDITION的节点
                 unlinkCancelledWaiters();
                 t = lastWaiter;
             }
@@ -1912,7 +1914,9 @@ public abstract class AbstractQueuedSynchronizer
          */
         private void unlinkCancelledWaiters() {
             Node t = firstWaiter;
+            //当前T节点的替身
             Node trail = null;
+            //从头开始往下清除
             while (t != null) {
                 Node next = t.nextWaiter;
                 if (t.waitStatus != Node.CONDITION) {
@@ -2039,10 +2043,14 @@ public abstract class AbstractQueuedSynchronizer
         public final void await() throws InterruptedException {
             if (Thread.interrupted())
                 throw new InterruptedException();
+            //加入condition队列
             Node node = addConditionWaiter();
+            //释放锁
             int savedState = fullyRelease(node);
             int interruptMode = 0;
+            //isOnSyncQueue函数，node节点是不是在同步队列中
             while (!isOnSyncQueue(node)) {
+                //不在队列中
                 LockSupport.park(this);
                 if ((interruptMode = checkInterruptWhileWaiting(node)) != 0)
                     break;

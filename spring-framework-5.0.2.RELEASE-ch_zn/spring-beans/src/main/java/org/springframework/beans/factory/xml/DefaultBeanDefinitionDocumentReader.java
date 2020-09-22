@@ -118,6 +118,8 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	}
 
 
+	//创建BeanDefinitionParserDelegate，用于完成真正的解析过程
+
 	/**
 	 * Register each bean definition within the given root {@code <beans/>} element.
 	 */
@@ -158,8 +160,6 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 
 		this.delegate = parent;
 	}
-
-	//创建BeanDefinitionParserDelegate，用于完成真正的解析过程
 	protected BeanDefinitionParserDelegate createDelegate(
 			XmlReaderContext readerContext, Element root, @Nullable BeanDefinitionParserDelegate parentDelegate) {
 

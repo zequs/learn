@@ -36,7 +36,7 @@ public class Test {
         services.execute(myThreadE);
         new Thread(new SubThread(countDownLatch,"aa")).start();
         List list = new ArrayList();
-        list.stream()
+        list.stream();
     }
 
 }

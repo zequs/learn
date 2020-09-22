@@ -952,6 +952,7 @@ public abstract class AbstractQueuedSynchronizer
      * @param arg the acquire argument
      */
     private void doAcquireShared(int arg) {
+        //node放进队列前，最后一个节点。放进队列后，前节点
         final Node node = addWaiter(Node.SHARED);
         boolean failed = true;
         try {
@@ -1286,6 +1287,7 @@ public abstract class AbstractQueuedSynchronizer
      */
     public final void acquireShared(int arg) {
         if (tryAcquireShared(arg) < 0)
+            //未获取锁（写线程占用），放进队列
             doAcquireShared(arg);
     }
 

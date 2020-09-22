@@ -100,6 +100,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	private String serializationId;
 
 	/** Whether to allow re-registration of a different definition with the same name */
+	//允许bean覆盖
 	private boolean allowBeanDefinitionOverriding = true;
 
 	/** Whether to allow eager class loading even for lazy-init beans */
@@ -702,7 +703,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
 			//Bean不是抽象的，是单态模式的，且lazy-init属性配置为false
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
-				//如果指定名称的bean是创建容器的Bean
+				//如果指定名称的bean是创建容器的Bean(工厂bean)
 				if (isFactoryBean(beanName)) {
 					//FACTORY_BEAN_PREFIX=”&”，当Bean名称前面加”&”符号
 					//时，获取的是产生容器对象本身，而不是容器产生的Bean.

@@ -387,6 +387,8 @@ public abstract class ClassLoader {
      * {@link #getClassLoadingLock <tt>getClassLoadingLock</tt>} method
      * during the entire class loading process.
      *
+     * 双亲委派模型的规则就写在这里，如果要破坏双亲委派模型，只要重写这个方法就行
+     *
      * @param  name
      *         The <a href="#name">binary name</a> of the class
      *
@@ -403,24 +405,29 @@ public abstract class ClassLoader {
     {
         synchronized (getClassLoadingLock(name)) {
             // First, check if the class has already been loaded
+            // 查看这个class有没有别加载过，本地方法实现
             Class<?> c = findLoadedClass(name);
+            // c==null,表示没有加载
             if (c == null) {
                 long t0 = System.nanoTime();
                 try {
                     if (parent != null) {
+                        //递归父加载器加载
                         c = parent.loadClass(name, false);
                     } else {
+                        // bootstrap classLoader
                         c = findBootstrapClassOrNull(name);
                     }
                 } catch (ClassNotFoundException e) {
                     // ClassNotFoundException thrown if class not found
                     // from the non-null parent class loader
                 }
-
+                // 父加载器没有加载，则自己加载
                 if (c == null) {
                     // If still not found, then invoke findClass in order
                     // to find the class.
                     long t1 = System.nanoTime();
+                    //自己加载（子类自己实现）
                     c = findClass(name);
 
                     // this is the defining class loader; record the stats
@@ -429,6 +436,7 @@ public abstract class ClassLoader {
                     sun.misc.PerfCounter.getFindClasses().increment();
                 }
             }
+            //解析，符号引用转化为直接引用（直接内存地址）
             if (resolve) {
                 resolveClass(c);
             }
@@ -1524,7 +1532,7 @@ public abstract class ClassLoader {
     private static ClassLoader scl;
 
     // Set to true once the system class loader has been set
-    // @GuardedBy("ClassLoader.class")
+//     @GuardedBy("ClassLoader.class")
     private static boolean sclSet;
 
 

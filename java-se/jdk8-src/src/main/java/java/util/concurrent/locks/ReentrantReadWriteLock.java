@@ -398,6 +398,7 @@ public class ReentrantReadWriteLock
                 // (Note: if c != 0 and w == 0 then shared count != 0)
                 // w=0说明是读锁占用了
                 //w!=0 并且不是当前线程占用锁
+                //如果当前线程读锁获取，写锁尝试锁，也能获取成功
                 if (w == 0 || current != getExclusiveOwnerThread())
                     return false;
                 if (w + exclusiveCount(acquires) > MAX_COUNT)
@@ -408,7 +409,8 @@ public class ReentrantReadWriteLock
                 return true;
             }
             // c=0读写锁都没有占用锁
-            //writerShouldBlock控制公平锁和非公平锁
+            //writerShouldBlock 公平锁：如果已经有队列在获取锁，则直接直接获取锁失败。进行排队
+            //writerShouldBlock 非公平锁。不管有没有队列在不在获取锁，都可以尝试获取锁。不需要公平
             if (writerShouldBlock() ||
                 !compareAndSetState(c, c + acquires))
                 return false;
@@ -473,11 +475,12 @@ public class ReentrantReadWriteLock
             int c = getState();
             //写锁：exclusiveCount(c)
             if (exclusiveCount(c) != 0 &&
+                    //如果 占有线程是当前线程说明是锁降级
                 getExclusiveOwnerThread() != current)
                 return -1;
             //获取读锁
             int r = sharedCount(c);
-            //readerShouldBlock 是否有队列在排队。公平锁与非公平锁的实现不一样，非公平锁直接返回false
+            //readerShouldBlock 是否有队列在排队。公平锁与非公平锁的实现不一样
             if (!readerShouldBlock() &&
                 r < MAX_COUNT &&
                 compareAndSetState(c, c + SHARED_UNIT)) {

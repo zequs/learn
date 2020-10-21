@@ -312,10 +312,12 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 */
 	//扫描给定类路径的包
 	public Set<BeanDefinition> findCandidateComponents(String basePackage) {
+		//componentsIndex，索引存储component对象，使用@Indexed。译打包的时候会在项目中自动生成`META-INT/spring.components`文件
 		if (this.componentsIndex != null && indexSupportsIncludeFilters()) {
 			return addCandidateComponentsFromIndex(this.componentsIndex, basePackage);
 		}
 		else {
+			//去扫描包
 			return scanCandidateComponents(basePackage);
 		}
 	}
@@ -421,10 +423,12 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	}
 
 	private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
+		//有效bean，既用@Component或元注解中带有@Component注解的类
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
 		try {
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
+			//扫描到包下面的所有文件
 			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();

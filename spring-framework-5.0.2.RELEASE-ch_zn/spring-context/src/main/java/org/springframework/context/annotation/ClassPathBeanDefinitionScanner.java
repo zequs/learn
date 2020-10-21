@@ -283,7 +283,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 		//遍历扫描所有给定的包
 		for (String basePackage : basePackages) {
 			//调用父类ClassPathScanningCandidateComponentProvider的方法
-			//扫描给定类路径，获取符合条件的Bean定义
+			//扫描给定类路径，获取符合条件的Bean定义(@Component或元注解中带有@Component注解的类)
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 			//遍历扫描到的Bean
 			for (BeanDefinition candidate : candidates) {
@@ -300,7 +300,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 				}
 				//如果扫描到的Bean是Spring的注解Bean，则处理其通用的Spring注解
 				if (candidate instanceof AnnotatedBeanDefinition) {
-					//处理注解Bean中通用的注解，在分析注解Bean定义类读取器时已经分析过
+					//处理注解Bean中通用的注解@Lazy、@Primary，在分析注解Bean定义类读取器时已经分析过
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
 				//根据Bean名称检查指定的Bean是否需要在容器中注册，或者在容器中冲突

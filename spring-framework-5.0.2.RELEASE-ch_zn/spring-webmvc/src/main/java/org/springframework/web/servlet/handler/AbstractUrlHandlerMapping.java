@@ -167,6 +167,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 	@Nullable
 	protected Object lookupHandler(String urlPath, HttpServletRequest request) throws Exception {
 		// Direct match?
+		//直接从map中获取
 		Object handler = this.handlerMap.get(urlPath);
 		if (handler != null) {
 			// Bean name or resolved handler?
@@ -178,12 +179,13 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 			return buildPathExposingHandler(handler, urlPath, urlPath, null);
 		}
 
-		// Pattern match?
+		// Pattern match? 正则匹配等
 		List<String> matchingPatterns = new ArrayList<>();
 		for (String registeredPattern : this.handlerMap.keySet()) {
 			if (getPathMatcher().match(registeredPattern, urlPath)) {
 				matchingPatterns.add(registeredPattern);
 			}
+			//路径最后带斜杆
 			else if (useTrailingSlashMatch()) {
 				if (!registeredPattern.endsWith("/") && getPathMatcher().match(registeredPattern + "/", urlPath)) {
 					matchingPatterns.add(registeredPattern +"/");
@@ -191,6 +193,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 			}
 		}
 
+		//matchingPatterns多个匹配，比较最优
 		String bestMatch = null;
 		Comparator<String> patternComparator = getPathMatcher().getPatternComparator(urlPath);
 		if (!matchingPatterns.isEmpty()) {
@@ -221,6 +224,7 @@ public abstract class AbstractUrlHandlerMapping extends AbstractHandlerMapping i
 
 			// There might be multiple 'best patterns', let's make sure we have the correct URI template variables
 			// for all of them
+			// 前面排序sort之后取第一个，有可能sort前面几个等于0的情况。所以第一个不一定就是最优解
 			Map<String, String> uriTemplateVariables = new LinkedHashMap<>();
 			for (String matchingPattern : matchingPatterns) {
 				if (patternComparator.compare(bestMatch, matchingPattern) == 0) {

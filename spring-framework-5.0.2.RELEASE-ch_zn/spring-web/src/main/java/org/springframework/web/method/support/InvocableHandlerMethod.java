@@ -127,12 +127,13 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	@Nullable
 	public Object invokeForRequest(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
-
+		//从request中解析出HandlerMethod方法所需要的参数，并返回Object[]
 		Object[] args = getMethodArgumentValues(request, mavContainer, providedArgs);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Invoking '" + ClassUtils.getQualifiedMethodName(getMethod(), getBeanType()) +
 					"' with arguments " + Arrays.toString(args));
 		}
+		//通过反射执行HandleMethod中的method，方法参数为args。并返回方法执行的返回值
 		Object returnValue = doInvoke(args);
 		if (logger.isTraceEnabled()) {
 			logger.trace("Method [" + ClassUtils.getQualifiedMethodName(getMethod(), getBeanType()) +
@@ -146,8 +147,9 @@ public class InvocableHandlerMethod extends HandlerMethod {
 	 */
 	private Object[] getMethodArgumentValues(NativeWebRequest request, @Nullable ModelAndViewContainer mavContainer,
 			Object... providedArgs) throws Exception {
-
+		//获取方法参数数组
 		MethodParameter[] parameters = getMethodParameters();
+		//创建一个参数数组，保存从request解析出的方法参数
 		Object[] args = new Object[parameters.length];
 		for (int i = 0; i < parameters.length; i++) {
 			MethodParameter parameter = parameters[i];
@@ -156,6 +158,7 @@ public class InvocableHandlerMethod extends HandlerMethod {
 			if (args[i] != null) {
 				continue;
 			}
+			//判断之前RequestMappingHandlerAdapter初始化的那24个HandlerMethodArgumentResolver（参数解析器），是否存在支持该参数解析的解析器
 			if (this.argumentResolvers.supportsParameter(parameter)) {
 				try {
 					args[i] = this.argumentResolvers.resolveArgument(

@@ -842,11 +842,12 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 	/**
 	 * Override the parent class implementation in order to intercept PATCH requests.
+	 * Servlet service()方法入口
 	 */
 	@Override
 	protected void service(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		//
 		HttpMethod httpMethod = HttpMethod.resolve(request.getMethod());
 		if (HttpMethod.PATCH == httpMethod || httpMethod == null) {
 			processRequest(request, response);
@@ -963,10 +964,12 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		long startTime = System.currentTimeMillis();
 		Throwable failureCause = null;
 
+		//LocaleContext保存这本地化信息，国际化相关
 		LocaleContext previousLocaleContext = LocaleContextHolder.getLocaleContext();
 		LocaleContext localeContext = buildLocaleContext(request);
 
 		RequestAttributes previousAttributes = RequestContextHolder.getRequestAttributes();
+		//封装了request,response，session
 		ServletRequestAttributes requestAttributes = buildRequestAttributes(request, response, previousAttributes);
 
 		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);

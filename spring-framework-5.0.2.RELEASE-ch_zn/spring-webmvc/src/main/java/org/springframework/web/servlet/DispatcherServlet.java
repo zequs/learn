@@ -884,7 +884,9 @@ public class DispatcherServlet extends FrameworkServlet {
 		// Keep a snapshot of the request attributes in case of an include,
 		// to be able to restore the original attributes after the include.
 		Map<String, Object> attributesSnapshot = null;
+		//首先判断是不是include请求，<jsp:include page="xxx.jsp"/>
 		if (WebUtils.isIncludeRequest(request)) {
+			//是include请求，则对request的Attribute做个快照备份，等doDispatch()处理好之后进行还原
 			attributesSnapshot = new HashMap<>();
 			Enumeration<?> attrNames = request.getAttributeNames();
 			while (attrNames.hasMoreElements()) {
@@ -901,6 +903,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		request.setAttribute(THEME_RESOLVER_ATTRIBUTE, this.themeResolver);
 		request.setAttribute(THEME_SOURCE_ATTRIBUTE, getThemeSource());
 
+		//FlashMap。主要用于Redirect转发时参数的传递
 		if (this.flashMapManager != null) {
 			FlashMap inputFlashMap = this.flashMapManager.retrieveAndUpdate(request, response);
 			if (inputFlashMap != null) {
@@ -937,6 +940,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	/** 中央控制器,控制请求的转发 **/
 	protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		HttpServletRequest processedRequest = request;
+		//处理请求的处理器链
 		HandlerExecutionChain mappedHandler = null;
 		boolean multipartRequestParsed = false;
 
@@ -981,6 +985,7 @@ public class DispatcherServlet extends FrameworkServlet {
 					}
 				}
 
+				//handle前置处理
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					return;
 				}
@@ -995,6 +1000,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 				// 结果视图对象的处理
 				applyDefaultViewName(processedRequest, mv);
+				//handle后置处理
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -1005,6 +1011,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				// making them available for @ExceptionHandler methods and other scenarios.
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
+			//处理前面返回的结果。处理异常，渲染页面，触发Interceptor的afterCompletion()
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
 		catch (Exception ex) {

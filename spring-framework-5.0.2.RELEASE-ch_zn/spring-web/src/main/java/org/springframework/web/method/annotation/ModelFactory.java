@@ -108,6 +108,7 @@ public final class ModelFactory {
 
 		Map<String, ?> sessionAttributes = this.sessionAttributesHandler.retrieveAttributes(request);
 		container.mergeAttributes(sessionAttributes);
+		//执行注释了@ModelAttribute的方法，并将结果设置到model
 		invokeModelAttributeMethods(request, container);
 
 		for (String name : findSessionAttributeArguments(handlerMethod)) {

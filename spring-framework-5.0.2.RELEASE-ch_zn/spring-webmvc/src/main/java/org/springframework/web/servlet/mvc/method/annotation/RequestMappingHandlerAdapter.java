@@ -108,6 +108,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 	private List<HttpMessageConverter<?>> messageConverters;
 
+	//存放 bean中requestBodyAdvice实现类和ResponseBodyAdvice实现类
 	private List<Object> requestResponseBodyAdvice = new ArrayList<>();
 
 	@Nullable
@@ -142,10 +143,12 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 
 	private final Map<Class<?>, Set<Method>> initBinderCache = new ConcurrentHashMap<>(64);
 
+	//存放bean中@ControllerAdvice注解类中@InitBinder注解方法
 	private final Map<ControllerAdviceBean, Set<Method>> initBinderAdviceCache = new LinkedHashMap<>();
 
 	private final Map<Class<?>, Set<Method>> modelAttributeCache = new ConcurrentHashMap<>(64);
 
+	//存放bean中@ControllerAdvice注解类中@ModelAttribute注解方法
 	private final Map<ControllerAdviceBean, Set<Method>> modelAttributeAdviceCache = new LinkedHashMap<>();
 
 
@@ -514,6 +517,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	@Override
 	public void afterPropertiesSet() {
 		// Do this first, it may add ResponseBody advice beans
+		//@ControllerAdvice 注解处理
 		initControllerAdviceCache();
 
 		if (this.argumentResolvers == null) {
@@ -538,6 +542,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			logger.info("Looking for @ControllerAdvice: " + getApplicationContext());
 		}
 
+		//@ControllerAdvice注解类
 		List<ControllerAdviceBean> adviceBeans = ControllerAdviceBean.findAnnotatedBeans(getApplicationContext());
 		AnnotationAwareOrderComparator.sort(adviceBeans);
 
@@ -548,6 +553,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			if (beanType == null) {
 				throw new IllegalStateException("Unresolvable type for ControllerAdviceBean: " + adviceBean);
 			}
+			//处理@ControllerAdvice类中@ModelAttribute方法
 			Set<Method> attrMethods = MethodIntrospector.selectMethods(beanType, MODEL_ATTRIBUTE_METHODS);
 			if (!attrMethods.isEmpty()) {
 				this.modelAttributeAdviceCache.put(adviceBean, attrMethods);
@@ -555,6 +561,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 					logger.info("Detected @ModelAttribute methods in " + adviceBean);
 				}
 			}
+			//处理@ControllerAdvice类中@InitBinder注解方法
 			Set<Method> binderMethods = MethodIntrospector.selectMethods(beanType, INIT_BINDER_METHODS);
 			if (!binderMethods.isEmpty()) {
 				this.initBinderAdviceCache.put(adviceBean, binderMethods);
@@ -562,12 +569,14 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 					logger.info("Detected @InitBinder methods in " + adviceBean);
 				}
 			}
+			//处理RequestBodyAdvice实现类放入requestResponseBodyList中
 			if (RequestBodyAdvice.class.isAssignableFrom(beanType)) {
 				requestResponseBodyAdviceBeans.add(adviceBean);
 				if (logger.isInfoEnabled()) {
 					logger.info("Detected RequestBodyAdvice bean in " + adviceBean);
 				}
 			}
+			//处理ResponseBodyAdvice实现类放入requestResponseBodyList中
 			if (ResponseBodyAdvice.class.isAssignableFrom(beanType)) {
 				requestResponseBodyAdviceBeans.add(adviceBean);
 				if (logger.isInfoEnabled()) {
@@ -589,6 +598,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		List<HandlerMethodArgumentResolver> resolvers = new ArrayList<>();
 
 		// Annotation-based argument resolution
+		// 添加按注释解析参数的解析器
 		resolvers.add(new RequestParamMethodArgumentResolver(getBeanFactory(), false));
 		resolvers.add(new RequestParamMapMethodArgumentResolver());
 		resolvers.add(new PathVariableMethodArgumentResolver());
@@ -606,6 +616,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		resolvers.add(new RequestAttributeMethodArgumentResolver());
 
 		// Type-based argument resolution
+		//添加按类型解析参数的解析器
 		resolvers.add(new ServletRequestMethodArgumentResolver());
 		resolvers.add(new ServletResponseMethodArgumentResolver());
 		resolvers.add(new HttpEntityMethodProcessor(getMessageConverters(), this.requestResponseBodyAdvice));
@@ -617,11 +628,13 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		resolvers.add(new UriComponentsBuilderMethodArgumentResolver());
 
 		// Custom arguments
+		// 添加自定义参数的解析器，主要用于解析自定义类型
 		if (getCustomArgumentResolvers() != null) {
 			resolvers.addAll(getCustomArgumentResolvers());
 		}
 
 		// Catch-all
+		//解析所有类型的解析器
 		resolvers.add(new RequestParamMethodArgumentResolver(getBeanFactory(), true));
 		resolvers.add(new ServletModelAttributeMethodProcessor(true));
 
@@ -747,6 +760,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			mav = invokeHandlerMethod(request, response, handlerMethod);
 		}
 
+		//判断handler是否有@SessionAttributes注释的参数
 		if (!response.containsHeader(HEADER_CACHE_CONTROL)) {
 			if (getSessionAttributesHandler(handlerMethod).hasSessionAttributes()) {
 				applyCacheSeconds(response, this.cacheSecondsForSessionAttributeHandlers);
@@ -800,9 +814,16 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	protected ModelAndView invokeHandlerMethod(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
 
+		//封装request，response
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
 		try {
+			//WebDataBinder的工厂，创建WebDataBinder，WebDataBinder用于参数绑定，主要功能就是实现参数跟String之间的类型转换
+			//WebDataBinder在ArgumentResolver在进行参数解析的时候会用到，ModelFactory在更新model的时候也会用到
 			WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
+
+			//ModelFactory是处理Model的主要包括2个功能
+			//1：在处理器处理之前对Model进行初始化
+			//2:在处理器处理之后对Model参数进行更新
 			ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
 
 			ServletInvocableHandlerMethod invocableMethod = createInvocableHandlerMethod(handlerMethod);
@@ -815,6 +836,10 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			invocableMethod.setDataBinderFactory(binderFactory);
 			invocableMethod.setParameterNameDiscoverer(this.parameterNameDiscoverer);
 
+			//设置ModelAndViewContainer容器
+			//1：将FlashMap中的数据设置到Model
+			//2: 使用ModelFactory将SessionAttributes和注解了@ModelAttribute的方法的参数设置到Model
+			//3：根据配置将IgnoreDefaultModelOnRedirect进行配置
 			ModelAndViewContainer mavContainer = new ModelAndViewContainer();
 			mavContainer.addAllAttributes(RequestContextUtils.getInputFlashMap(request));
 			modelFactory.initModel(webRequest, mavContainer, invocableMethod);
@@ -823,6 +848,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			AsyncWebRequest asyncWebRequest = WebAsyncUtils.createAsyncWebRequest(request, response);
 			asyncWebRequest.setTimeout(this.asyncRequestTimeout);
 
+			//异步处理
 			WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
 			asyncManager.setTaskExecutor(this.taskExecutor);
 			asyncManager.setAsyncWebRequest(asyncWebRequest);
@@ -838,12 +864,12 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 				}
 				invocableMethod = invocableMethod.wrapConcurrentResult(result);
 			}
-
+			//执行
 			invocableMethod.invokeAndHandle(webRequest, mavContainer);
 			if (asyncManager.isConcurrentHandlingStarted()) {
 				return null;
 			}
-
+			//处理完请求后后置处理
 			return getModelAndView(mavContainer, modelFactory, webRequest);
 		}
 		finally {
@@ -861,16 +887,24 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		return new ServletInvocableHandlerMethod(handlerMethod);
 	}
 
+	/**
+	 * ModelFactory是处理Model的主要包括2个功能
+	 * 1：在处理器处理之前对Model进行初始化
+	 * 2:在处理器处理之后对Model参数进行更新
+	 *
+	 */
 	private ModelFactory getModelFactory(HandlerMethod handlerMethod, WebDataBinderFactory binderFactory) {
 		SessionAttributesHandler sessionAttrHandler = getSessionAttributesHandler(handlerMethod);
 		Class<?> handlerType = handlerMethod.getBeanType();
 		Set<Method> methods = this.modelAttributeCache.get(handlerType);
 		if (methods == null) {
+			//处理器注解了@ModelAttribute注解，而且没有注解@RequestMapping注解的方法
 			methods = MethodIntrospector.selectMethods(handlerType, MODEL_ATTRIBUTE_METHODS);
 			this.modelAttributeCache.put(handlerType, methods);
 		}
 		List<InvocableHandlerMethod> attrMethods = new ArrayList<>();
 		// Global methods first
+		// 全局优先。全局@ModelAttribute。既@ControllerAdvice类中注解了@ModelAttribute方法
 		this.modelAttributeAdviceCache.forEach((clazz, methodSet) -> {
 			if (clazz.isApplicableToBeanType(handlerType)) {
 				Object bean = clazz.resolveBean();
@@ -896,8 +930,14 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		return attrMethod;
 	}
 
+	/**
+	 * 创建WebDataBinderFactory的过程就是将符合条件的注解了@InitBinder的方法找出来。
+	 * 创建ServletRequestDataBinderFactory类型的WebDataBinderFactory
+	 * HandlerMethod request请求处理方法。
+	 */
 	private WebDataBinderFactory getDataBinderFactory(HandlerMethod handlerMethod) throws Exception {
 		Class<?> handlerType = handlerMethod.getBeanType();
+		//标注了@InitBinder注解的方法
 		Set<Method> methods = this.initBinderCache.get(handlerType);
 		if (methods == null) {
 			methods = MethodIntrospector.selectMethods(handlerType, INIT_BINDER_METHODS);
@@ -905,6 +945,8 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		}
 		List<InvocableHandlerMethod> initBinderMethods = new ArrayList<>();
 		// Global methods first
+		// 全局配置优先， 配置了@ControllerAdivce注解，InitBinder方法
+		// 全局的InitBinder方法在创建RequestMethodHandlerAdapter的时候已经设置到缓存中了。
 		this.initBinderAdviceCache.forEach((clazz, methodSet) -> {
 			if (clazz.isApplicableToBeanType(handlerType)) {
 				Object bean = clazz.resolveBean();
@@ -913,6 +955,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 				}
 			}
 		});
+		//将当前Handler中的InitBinder方法添加到initBinderMethods
 		for (Method method : methods) {
 			Object bean = handlerMethod.getBean();
 			initBinderMethods.add(createInitBinderMethod(bean, method));
@@ -944,20 +987,28 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		return new ServletRequestDataBinderFactory(binderMethods, getWebBindingInitializer());
 	}
 
+	/**
+	 * 1：调用ModelFactory的updateModel方法更新了Model
+	 * 2：根据mavContainer创建了ModelAndView
+	 * 3: 如果mavContainer里model是RedirectAttribute类型则将其设置到FlashMap
+	 *
+	 */
 	@Nullable
 	private ModelAndView getModelAndView(ModelAndViewContainer mavContainer,
 			ModelFactory modelFactory, NativeWebRequest webRequest) throws Exception {
-
+		//更新了Model
 		modelFactory.updateModel(webRequest, mavContainer);
 		if (mavContainer.isRequestHandled()) {
 			return null;
 		}
 		ModelMap model = mavContainer.getModel();
+		//创建了ModelAndView
 		ModelAndView mav = new ModelAndView(mavContainer.getViewName(), model, mavContainer.getStatus());
 		if (!mavContainer.isViewReference()) {
 			mav.setView((View) mavContainer.getView());
 		}
 		if (model instanceof RedirectAttributes) {
+			//设置到FlashMap
 			Map<String, ?> flashAttributes = ((RedirectAttributes) model).getFlashAttributes();
 			HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 			if (request != null) {

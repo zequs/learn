@@ -74,8 +74,8 @@ public abstract class ApplicationObjectSupport implements ApplicationContextAwar
 						"Invalid application context: needs to be of type [" + requiredContextClass().getName() + "]");
 			}
 			this.applicationContext = context;
-			this.messageSourceAccessor = new MessageSourceAccessor(context);
 			initApplicationContext(context);
+			this.messageSourceAccessor = new MessageSourceAccessor(context);
 		}
 		else {
 			// Ignore reinitialization if same context passed in.

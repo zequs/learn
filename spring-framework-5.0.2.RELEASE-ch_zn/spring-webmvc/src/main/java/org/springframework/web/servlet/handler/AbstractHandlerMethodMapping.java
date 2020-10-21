@@ -227,6 +227,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @param handler the bean name of a handler or a handler instance
 	 */
 	protected void detectHandlerMethods(final Object handler) {
+		//获取handler类型
 		Class<?> handlerType = (handler instanceof String ?
 				obtainApplicationContext().getType((String) handler) : handler.getClass());
 
@@ -308,12 +309,14 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	@Override
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
+		//1:request中获取url
 		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
 		if (logger.isDebugEnabled()) {
 			logger.debug("Looking up handler method for path " + lookupPath);
 		}
 		this.mappingRegistry.acquireReadLock();
 		try {
+			//2：查找HandlerMethod
 			HandlerMethod handlerMethod = lookupHandlerMethod(lookupPath, request);
 			if (logger.isDebugEnabled()) {
 				if (handlerMethod != null) {
@@ -323,6 +326,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 					logger.debug("Did not find handler method for [" + lookupPath + "]");
 				}
 			}
+			// 3:handlerMethod中的bean如果是String类型就拼装bean返回HandlerMethod
 			return (handlerMethod != null ? handlerMethod.createWithResolvedBean() : null);
 		}
 		finally {
@@ -485,6 +489,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 		private final Map<T, HandlerMethod> mappingLookup = new LinkedHashMap<>();
 
+		//key为url地址（/user/getUser）,value是一个list<RequestMappingInfo>
 		private final MultiValueMap<String, T> urlLookup = new LinkedMultiValueMap<>();
 
 		private final Map<String, List<HandlerMethod>> nameLookup = new ConcurrentHashMap<>();
@@ -557,6 +562,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 				String name = null;
 				if (getNamingStrategy() != null) {
+					//name策略模式，可以自己实现，默认是类大写缩写 + "#" + 方法（如：UserController类getUser方法，name="UC#getUser"）
 					name = getNamingStrategy().getName(handlerMethod, mapping);
 					addMappingName(name, handlerMethod);
 				}

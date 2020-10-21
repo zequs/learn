@@ -162,6 +162,8 @@ class ConfigurationClassParser {
 		for (BeanDefinitionHolder holder : configCandidates) {
 			BeanDefinition bd = holder.getBeanDefinition();
 			try {
+				// 根据BeanDefinition类型的不同，调用parse()不同的重载方法
+				// 实际上最终都是调用processConfigurationClass()方法
 				if (bd instanceof AnnotatedBeanDefinition) {
 					parse(((AnnotatedBeanDefinition) bd).getMetadata(), holder.getBeanName());
 				}
@@ -180,7 +182,7 @@ class ConfigurationClassParser {
 						"Failed to parse configuration class [" + bd.getBeanClassName() + "]", ex);
 			}
 		}
-
+		//处理延迟importSelector
 		processDeferredImportSelectors();
 	}
 
@@ -237,6 +239,9 @@ class ConfigurationClassParser {
 		}
 
 		// Recursively process the configuration class and its superclass hierarchy.
+		// 处理配置类，由于配置类可能存在父类(若父类的全类名是以java开头的，则除外)，所有需要将configClass变成sourceClass去解析，然后返回sourceClass的父类。
+		// 如果此时父类为空，则不会进行while循环去解析，如果父类不为空，则会循环的去解析父类
+		// SourceClass的意义：简单的包装类，目的是为了以统一的方式去处理带有注解的类，不管这些类是如何加载的
 		SourceClass sourceClass = asSourceClass(configClass);
 		do {
 			//解析@PropertySources，@ComponentScans，@ImportResource
@@ -260,6 +265,7 @@ class ConfigurationClassParser {
 			throws IOException {
 
 		// Recursively process any member (nested) classes first
+		// 1、首先处理内部类，处理内部类时，最终还是调用doProcessConfigurationClass()方法
 		processMemberClasses(configClass, sourceClass);
 
 		// Process any @PropertySource annotations

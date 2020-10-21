@@ -75,7 +75,7 @@ public abstract class AbstractDetectingUrlHandlerMapping extends AbstractUrlHand
 		if (logger.isDebugEnabled()) {
 			logger.debug("Looking for URL mappings in application context: " + applicationContext);
 		}
-		// 获取ApplicationContext容器中所有bean的Name
+		// detectHandlersInAncestorContexts标记，ture 可以从父类容器中获取bean,否则从自身容器（ApplicationContext）获取所有bean的Name
 		String[] beanNames = (this.detectHandlersInAncestorContexts ?
 				BeanFactoryUtils.beanNamesForTypeIncludingAncestors(applicationContext, Object.class) :
 				applicationContext.getBeanNamesForType(Object.class));

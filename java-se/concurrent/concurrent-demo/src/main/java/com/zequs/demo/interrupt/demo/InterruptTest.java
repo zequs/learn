@@ -75,7 +75,7 @@ public class InterruptTest {
 
     public static void main(String[] args) {
         InterruptTest test = new InterruptTest();
-        test.t3();
+        test.t1();
         //interrupted：当前线程。
 //        Thread.currentThread().interrupt();
 //        System.out.println("第一次调用thread.interrupted():" + Thread.interrupted());

@@ -5,13 +5,16 @@ import java.util.concurrent.locks.LockSupport;
 
 /**
  * await的话需要锁，锁的话synchronize同步
+ * LockSupport中park的话会一直堵住，只有unpark这个线程时才会往下执行下去
+ * 也可以先unpark,在park的话，unpark会起效果，park不会被锁住
+ * 先unpark，后park的话，只有一次有效，不管几次unpark，park的话只能通行一次
  * 
  * @author zequs
  * @version $Id: concurrent-demo, v0.1 2020 07 10 Exp $
  */
 public class LockSupportTest {
     public static void main(String[] args) {
-        m2();
+        m1();
     }
 
     /**
@@ -57,7 +60,7 @@ public class LockSupportTest {
                 if (i == 5) {
                     LockSupport.park();
                 }
-                if (i == 6) {
+                if (i == 8) {
                     //会一直堵住，不能提前2次获取令牌
                     LockSupport.park();
                 }
@@ -65,11 +68,11 @@ public class LockSupportTest {
             }
         });
 
-        System.out.println("调用unpack成功");
         t.start();
         //线程必须先启动
         LockSupport.unpark(t);
         LockSupport.unpark(t);
+        System.out.println("调用unpack成功");
     }
 
 }

@@ -1,6 +1,5 @@
 package com.zequs.demo.concurrent.demo;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -18,8 +17,9 @@ public class Test4 {
         MyRejectedExecutionHandler handler = new MyRejectedExecutionHandler();
         ThreadFactory threadFactory = Executors.defaultThreadFactory();
 
-        ExecutorService services = new ThreadPoolExecutor(2,4,5, TimeUnit.SECONDS, queue, handler);
-        services.execute(() ->{
+        ExecutorService services = new ThreadPoolExecutor(2, 4, 5, TimeUnit.SECONDS, queue,
+            handler);
+        services.execute(() -> {
             System.out.println("11111111111");
         });
         System.out.println("222");

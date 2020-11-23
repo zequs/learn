@@ -1,7 +1,6 @@
 package com.zequs.demo.se.designpattern.pattern.singletion.type6;
 
 /**
- *
  * 双重检查
  *
  * @author zequs
@@ -9,7 +8,7 @@ package com.zequs.demo.se.designpattern.pattern.singletion.type6;
  */
 public class Singleton {
 
-    private  static volatile Singleton instance =  null;
+    private static volatile Singleton instance = null;
 
     private Singleton() {
 

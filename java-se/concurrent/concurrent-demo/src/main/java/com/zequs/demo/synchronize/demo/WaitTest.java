@@ -1,7 +1,5 @@
 package com.zequs.demo.synchronize.demo;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -64,6 +62,7 @@ public class WaitTest {
             }
         }).start();
     }
+
     public static void main(String[] args) {
         m1();
     }
